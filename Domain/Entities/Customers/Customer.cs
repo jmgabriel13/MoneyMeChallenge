@@ -1,7 +1,9 @@
-﻿namespace Domain.Entities.Customers;
+﻿using Domain.Entities.Loans;
+
+namespace Domain.Entities.Customers;
 public class Customer
 {
-    public Guid CustomerId { get; set; }
+    public Guid Id { get; set; }
     public string Title { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
@@ -9,4 +11,5 @@ public class Customer
     public string MobileNumber { get; set; }
     public string Email { get; set; }
     public string RedirectURL { get; set; }
+    public Loan Loan { get; set; }
 }

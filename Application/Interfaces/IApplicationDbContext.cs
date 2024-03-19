@@ -1,8 +1,14 @@
-﻿using Domain.Entities.CalculatedQoutes;
+﻿using Domain.Entities.Customers;
+using Domain.Entities.LoanApplications;
+using Domain.Entities.Loans;
+using Domain.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Interfaces;
 public interface IApplicationDbContext
 {
-    DbSet<CalculatedQuote> CalculatedQuotes { get; set; }
+    DbSet<LoanApplicaton> LoanApplicatons { get; set; }
+    DbSet<Customer> Customers { get; set; }
+    DbSet<Product> Products { get; set; }
+    DbSet<Loan> Loans { get; set; }
 }

@@ -7,8 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Customers\ICustomerRepository.cs~RFb878ff9.TMP" />
     <None Remove="Interfaces\IUnitOfWork.cs~RFa278923.TMP" />
-    <None Remove="Transactions\TransactionService.cs~RFa57093c.TMP" />
+    <None Remove="LoanApplications\TransactionService.cs~RFa57093c.TMP" />
   </ItemGroup>
 
   <ItemGroup>
