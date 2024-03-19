@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Entities\Customers\Customer.cs~RFa133298.TMP" />
+    <None Remove="Entities\Quotes\Quote.cs~RF9db29bf.TMP" />
+    <None Remove="Entities\Quotes\Quote.cs~RF9e07d84.TMP" />
+    <None Remove="Entities\CalculatedQoutes\Transaction.cs~RF9e80291.TMP" />
+  </ItemGroup>
+
+</Project>
