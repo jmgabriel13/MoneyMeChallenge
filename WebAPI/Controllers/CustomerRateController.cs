@@ -17,7 +17,7 @@ public class CustomerRateController : ControllerBase
     [Route("rate")]
     public async Task<IActionResult> CustomerRate([FromBody] CreateLoanCustomerRateRequest request, CancellationToken cancellationToken)
     {
-        var redirectURL = $"{Request.Scheme}://{Request.Host}{Request.PathBase}{Request.Path}{Request.QueryString}";
+        var redirectURL = $"{Request.Scheme}://{Request.Host}";
 
         var result = await _customerLoanRateService.Create(request, redirectURL, cancellationToken);
 

@@ -3,8 +3,8 @@ public sealed record CreateLoanCustomerRateRequest(
     string Title,
     string FirstName,
     string LastName,
-    DateTime DateOfBirth,
+    string DateOfBirth,
     string MobileNumber,
     string Email,
-    int Term,
-    int AmountRequired);
+    string Term,
+    string AmountRequired);

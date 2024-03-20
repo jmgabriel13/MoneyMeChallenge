@@ -18,11 +18,18 @@ public class CustomerLoanRateService : ICustomerLoanRateService
 
     public async Task<string> Create(CreateLoanCustomerRateRequest request, string redirectUrl, CancellationToken cancellationToken)
     {
+        bool isValidDate = DateTime.TryParse(request.DateOfBirth, out DateTime parsedDate);
+        if (!isValidDate)
+        {
+            // Return 
+            return "Date of Birth is not valid.";
+        }
+
         // Check if firstName, lastName and dateOfBirth is existing, then return same redirect URL
         var customer = await _customerRepository.GetByFirstLastNameAndDateOfBirthAsync(
             request.FirstName,
             request.LastName,
-            request.DateOfBirth,
+            parsedDate,
             cancellationToken);
 
         if (customer is not null)
@@ -31,6 +38,14 @@ public class CustomerLoanRateService : ICustomerLoanRateService
             return customer.RedirectURL;
         }
 
+        // Creating instance of loan
+        var loan = new Loan
+        {
+            Id = Guid.NewGuid(),
+            Term = Int32.Parse(request.Term),
+            AmountRequired = Int32.Parse(request.AmountRequired)
+        };
+
         // Creating new customer
         var newCustomer = new Customer
         {
@@ -38,18 +53,11 @@ public class CustomerLoanRateService : ICustomerLoanRateService
             Title = request.Title,
             FirstName = request.FirstName,
             LastName = request.LastName,
-            DateOfBirth = request.DateOfBirth,
+            DateOfBirth = parsedDate,
             MobileNumber = request.MobileNumber,
             Email = request.Email,
-            RedirectURL = redirectUrl
-        };
-
-        // Creating instance of loan
-        var loan = new Loan
-        {
-            Id = Guid.NewGuid(),
-            Term = request.Term,
-            AmountRequired = request.AmountRequired
+            RedirectURL = redirectUrl,
+            Loan = loan
         };
 
         _customerRepository.Add(newCustomer);

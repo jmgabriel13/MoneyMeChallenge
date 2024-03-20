@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Persistence.Repositories;
 public sealed class CustomerRepository : ICustomerRepository
 {
-
     private readonly ApplicationDbContext _context;
 
     public CustomerRepository(ApplicationDbContext context)
