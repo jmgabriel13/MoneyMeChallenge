@@ -26,13 +26,12 @@ public class LoanApplicationService
 
     public async Task Create(CreateLoanApplicationRequest request, string redirectUrl, CancellationToken cancellationToken)
     {
-        // Get product by Id
-        var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
+        var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
 
-        if (product is null && customer is null)
+        if (customer is null && product is null)
         {
-            // Return error, cant proceed if product and customer has not found
+            // Return error, cant proceed if customer and product are not found
             return;
         }
 
