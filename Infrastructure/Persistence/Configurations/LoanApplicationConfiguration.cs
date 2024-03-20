@@ -18,7 +18,7 @@ internal sealed class LoanApplicationConfiguration : IEntityTypeConfiguration<Lo
         builder.Property(la => la.TotalRepayments)
             .HasColumnType("decimal(18,4)");
 
-        builder.Property(la => la.MonthlyRepayment)
+        builder.Property(la => la.Repayment)
             .HasColumnType("decimal(18,4)");
 
         builder.Property(la => la.Interest)

@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240320124525_update_loan_application_entity")]
+    partial class update_loan_application_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,12 +80,8 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("InterestRate")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal>("Repayment")
+                    b.Property<decimal>("MonthlyRepayment")
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("RepaymentFrequency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -126,13 +125,13 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal>("InterestRate")
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
-
-                    b.Property<decimal>("PerAnnumInterestRate")
-                        .HasColumnType("decimal(18,4)");
 
                     b.HasKey("Id");
 
@@ -141,21 +140,21 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7788147c-0362-4ff0-83aa-3d6f8efb89db"),
-                            Name = "Product A",
-                            PerAnnumInterestRate = 0m
+                            Id = new Guid("0e79362e-a6d3-42d8-b374-50c0bfded2ee"),
+                            InterestRate = 0m,
+                            Name = "Product A"
                         },
                         new
                         {
-                            Id = new Guid("ca030e17-1a19-4d94-b2ca-48a578b08f90"),
-                            Name = "Product B",
-                            PerAnnumInterestRate = 9.20m
+                            Id = new Guid("9746015e-6628-4658-a5fb-3ea520549412"),
+                            InterestRate = 6.2m,
+                            Name = "Product B"
                         },
                         new
                         {
-                            Id = new Guid("e72414b4-ca00-4688-bcb4-30f4dea15425"),
-                            Name = "Product C",
-                            PerAnnumInterestRate = 10.58m
+                            Id = new Guid("e487dea5-90a1-498e-9666-1508b9be669a"),
+                            InterestRate = 8.3m,
+                            Name = "Product C"
                         });
                 });
 

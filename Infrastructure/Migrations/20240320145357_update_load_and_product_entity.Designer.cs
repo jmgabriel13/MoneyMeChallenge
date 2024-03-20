@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240320145357_update_load_and_product_entity")]
+    partial class update_load_and_product_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -80,9 +83,8 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Repayment")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<string>("RepaymentFrequency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("RepaymentFrequency")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -141,19 +143,19 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7788147c-0362-4ff0-83aa-3d6f8efb89db"),
+                            Id = new Guid("568580a9-fdf0-4ff2-9f99-f7f674adef43"),
                             Name = "Product A",
                             PerAnnumInterestRate = 0m
                         },
                         new
                         {
-                            Id = new Guid("ca030e17-1a19-4d94-b2ca-48a578b08f90"),
+                            Id = new Guid("32965560-bf68-4fd9-8518-f9908b9f7cff"),
                             Name = "Product B",
                             PerAnnumInterestRate = 9.20m
                         },
                         new
                         {
-                            Id = new Guid("e72414b4-ca00-4688-bcb4-30f4dea15425"),
+                            Id = new Guid("c01185ea-0ce9-4517-a469-7c1aa68f6e3c"),
                             Name = "Product C",
                             PerAnnumInterestRate = 10.58m
                         });

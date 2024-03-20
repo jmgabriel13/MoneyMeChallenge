@@ -3,5 +3,5 @@ public class Product
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
-    public decimal InterestRate { get; set; }
+    public decimal PerAnnumInterestRate { get; set; }
 }

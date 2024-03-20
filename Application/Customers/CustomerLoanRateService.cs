@@ -47,16 +47,17 @@ public class CustomerLoanRateService : ICustomerLoanRateService
         };
 
         // Creating new customer
+        var newCustomerId = Guid.NewGuid();
         var newCustomer = new Customer
         {
-            Id = Guid.NewGuid(),
+            Id = newCustomerId,
             Title = request.Title,
             FirstName = request.FirstName,
             LastName = request.LastName,
             DateOfBirth = parsedDate,
             MobileNumber = request.MobileNumber,
             Email = request.Email,
-            RedirectURL = redirectUrl,
+            RedirectURL = $"{redirectUrl}/quote-calculator?cust={newCustomerId}",
             Loan = loan
         };
 

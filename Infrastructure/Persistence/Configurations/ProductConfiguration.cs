@@ -12,7 +12,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.Name)
             .HasMaxLength(100);
 
-        builder.Property(p => p.InterestRate)
+        builder.Property(p => p.PerAnnumInterestRate)
             .HasColumnType("decimal(18,4)");
 
         // Seeding data
@@ -21,19 +21,19 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 Id = Guid.NewGuid(),
                 Name = "Product A",
-                InterestRate = 0
+                PerAnnumInterestRate = 0
             },
             new Product
             {
                 Id = Guid.NewGuid(),
                 Name = "Product B",
-                InterestRate = 6.2M
+                PerAnnumInterestRate = 9.20M
             },
             new Product
             {
                 Id = Guid.NewGuid(),
                 Name = "Product C",
-                InterestRate = 8.3M
+                PerAnnumInterestRate = 10.58M
             }
         );
     }

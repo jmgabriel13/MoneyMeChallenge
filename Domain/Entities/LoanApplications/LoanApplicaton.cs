@@ -5,9 +5,12 @@ public class LoanApplicaton
 
     public Guid Id { get; set; }
     public Guid CustomerId { get; set; }
+
+    // To be refactor, it needs to be a entity to be more flexible and extensible
+    public string RepaymentFrequency { get; set; }
+    public decimal Repayment { get; set; }
     public decimal TotalRepayments { get; set; }
-    public decimal MonthlyRepayment { get; set; }
-    public static int EstablishmentFee => _establishmentFee;
+    public int EstablishmentFee => _establishmentFee;
     public decimal Interest { get; set; }
     public decimal InterestRate { get; set; }
     public LoanStatus Status { get; set; }
