@@ -3,7 +3,7 @@ using Domain.Entities.Customers;
 using Domain.Entities.Loans;
 
 namespace Application.Customers;
-public class CustomerLoanRateService
+public class CustomerLoanRateService : ICustomerLoanRateService
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IUnitOfWork _unitOfWork;

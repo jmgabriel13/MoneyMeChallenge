@@ -1,5 +1,8 @@
-﻿using Application.Interfaces;
+﻿using Application.Customers;
+using Application.Interfaces;
+using Application.LoanApplications;
 using Infrastructure.Persistence;
+using Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +23,10 @@ public static class DependencyInjection
 
         services.AddScoped<IUnitOfWork>(sp =>
             sp.GetRequiredService<ApplicationDbContext>());
+
+        // Inject repositories
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<ILoanApplicationRepository, LoanApplicationRepository>();
 
         return services;
     }

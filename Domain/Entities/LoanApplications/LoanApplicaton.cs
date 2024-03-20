@@ -10,5 +10,5 @@ public class LoanApplicaton
     public static int EstablishmentFee => _establishmentFee;
     public decimal Interest { get; set; }
     public decimal InterestRate { get; set; }
-    public bool IsApproved { get; set; }
+    public LoanStatus Status { get; set; }
 }

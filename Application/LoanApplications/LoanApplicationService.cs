@@ -27,19 +27,12 @@ public class LoanApplicationService
     public async Task Create(CreateLoanApplicationRequest request, string redirectUrl, CancellationToken cancellationToken)
     {
         // Get product by Id
-        var product = await _productRepository.GetByIdAsync(request.ProductId);
+        var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
+        var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
 
-        if (product is null)
+        if (product is null && customer is null)
         {
-            // Return product not found
-            return;
-        }
-
-        var customer = await _customerRepository.FindByIdAsync(request.CustomerId);
-
-        if (customer is null)
-        {
-            // Return customer not found
+            // Return error, cant proceed if product and customer has not found
             return;
         }
 
@@ -55,7 +48,7 @@ public class LoanApplicationService
             TotalRepayments = (decimal)monthlyPayment * 12,
             MonthlyRepayment = (decimal)monthlyPayment,
             InterestRate = product.InterestRate,
-            IsApproved = false
+            Status = LoanStatus.Pending
         };
 
         _loanApplicationRepository.Add(loanApplication);
