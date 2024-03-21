@@ -1,5 +1,5 @@
 ﻿namespace Application.Customers;
-public sealed record CustomerResponse(
+public sealed record CustomerLoanResponse(
     string Title,
     string FirstName,
     string LastName,

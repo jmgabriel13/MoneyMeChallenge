@@ -14,9 +14,10 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCustomerById(Guid id, CancellationToken cancellationToken)
+    [Route("loan")]
+    public async Task<IActionResult> GetCustomerLoanById(Guid customerId, CancellationToken cancellationToken)
     {
-        var result = await _customerService.FindByIdAsync(id, cancellationToken);
+        var result = await _customerService.FindCustomerLoanByIdAsync(customerId, cancellationToken);
 
         if (result is null)
         {

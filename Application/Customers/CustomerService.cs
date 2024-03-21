@@ -57,7 +57,7 @@ public class CustomerService : ICustomerService
             DateOfBirth = parsedDate,
             MobileNumber = request.MobileNumber,
             Email = request.Email,
-            RedirectURL = $"{redirectUrl}/quote-calculator?cust={newCustomerId}",
+            RedirectURL = $"{redirectUrl}/quote-calculator?id={newCustomerId}",
             Loan = loan
         };
 
@@ -68,9 +68,9 @@ public class CustomerService : ICustomerService
         return newCustomer.RedirectURL;
     }
 
-    public async Task<CustomerResponse?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    public async Task<CustomerLoanResponse?> FindCustomerLoanByIdAsync(Guid customerId, CancellationToken cancellationToken = default)
     {
-        var customer = await _customerRepository.FindByIdAsync(id, cancellationToken);
+        var customer = await _customerRepository.FindByIdAsync(customerId, cancellationToken);
 
         if (customer is null)
         {
@@ -78,7 +78,7 @@ public class CustomerService : ICustomerService
         }
 
         // Customer response object
-        var response = new CustomerResponse(
+        var response = new CustomerLoanResponse(
             customer.Title,
             customer.FirstName,
             customer.LastName,
