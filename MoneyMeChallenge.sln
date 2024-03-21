@@ -5,13 +5,11 @@ VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{A25E36A9-5F56-458D-8040-E78CD78B718E}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8B724612-6D40-4505-8011-FBC4E5E2A326}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "Application\Application.csproj", "{BFA4BA44-616F-419F-A3A5-2D9BB275A2BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{BFA4BA44-616F-419F-A3A5-2D9BB275A2BA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{EE538CD0-1968-4E22-B62C-8E3DB90EE622}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{EE538CD0-1968-4E22-B62C-8E3DB90EE622}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{CAE9A5A8-E0C3-40D5-AC5D-BC4FDDF75204}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebAPI", "WebAPI\WebAPI.csproj", "{CAE9A5A8-E0C3-40D5-AC5D-BC4FDDF75204}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,12 +36,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A25E36A9-5F56-458D-8040-E78CD78B718E} = {8B724612-6D40-4505-8011-FBC4E5E2A326}
-		{BFA4BA44-616F-419F-A3A5-2D9BB275A2BA} = {8B724612-6D40-4505-8011-FBC4E5E2A326}
-		{EE538CD0-1968-4E22-B62C-8E3DB90EE622} = {8B724612-6D40-4505-8011-FBC4E5E2A326}
-		{CAE9A5A8-E0C3-40D5-AC5D-BC4FDDF75204} = {8B724612-6D40-4505-8011-FBC4E5E2A326}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {58A64FA4-73A7-4D21-B063-9AE73ACD6155}
