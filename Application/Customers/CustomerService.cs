@@ -3,12 +3,12 @@ using Domain.Entities.Customers;
 using Domain.Entities.Loans;
 
 namespace Application.Customers;
-public class CustomerLoanRateService : ICustomerLoanRateService
+public class CustomerService : ICustomerService
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public CustomerLoanRateService(
+    public CustomerService(
         ICustomerRepository customerRepository,
         IUnitOfWork unitOfWork)
     {
@@ -68,4 +68,26 @@ public class CustomerLoanRateService : ICustomerLoanRateService
         return newCustomer.RedirectURL;
     }
 
+    public async Task<CustomerResponse?> FindByIdAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        var customer = await _customerRepository.FindByIdAsync(id, cancellationToken);
+
+        if (customer is null)
+        {
+            throw new InvalidOperationException("Customer not found");
+        }
+
+        // Customer response object
+        var response = new CustomerResponse(
+            customer.Title,
+            customer.FirstName,
+            customer.LastName,
+            customer.DateOfBirth,
+            customer.MobileNumber,
+            customer.Email,
+            customer.Loan.Term,
+            customer.Loan.AmountRequired);
+
+        return response;
+    }
 }
