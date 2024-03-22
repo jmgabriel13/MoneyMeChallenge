@@ -7,4 +7,5 @@ export interface CustomerLoanDto {
     email: string,
     term: number,
     amountRequired: number,
+    product: string
 }

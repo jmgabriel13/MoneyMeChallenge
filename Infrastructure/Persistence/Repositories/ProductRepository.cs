@@ -17,6 +17,11 @@ public sealed class ProductRepository : IProductRepository
         _context.Add(product);
     }
 
+    public async Task<IReadOnlyCollection<Product>> GetAllProducts(CancellationToken cancellationToken = default)
+    {
+        return await _context.Products.ToListAsync(cancellationToken);
+    }
+
     public async Task<Product?> GetByIdAsync(Guid Id, CancellationToken cancellationToken = default)
     {
         return await _context.Products.FirstOrDefaultAsync(p => p.Id == Id, cancellationToken);

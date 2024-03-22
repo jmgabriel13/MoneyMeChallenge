@@ -6,13 +6,13 @@ function App() {
 	const location = useLocation();
 
 	return (
-		<>
+		<main>
 			{location.pathname === '/' ? <QouteCalculator /> : (
 				<div>
 					<Outlet />
 				</div>
 			)}
-		</>
+		</main>
 	)
 }
 

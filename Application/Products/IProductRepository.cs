@@ -5,4 +5,5 @@ public interface IProductRepository
 {
     void Add(Product product);
     Task<Product?> GetByIdAsync(Guid Id, CancellationToken cancellationToken = default);
+    Task<IReadOnlyCollection<Product>> GetAllProducts(CancellationToken cancellationToken = default);
 }
