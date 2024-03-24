@@ -7,7 +7,9 @@ public record CustomerQuoteResponse(
     int PrincipalAmount,
     int TermInMonths,
     decimal Repayment,
-    string PaymentFrequency,
+    string RepaymentFrequency,
+    decimal PerAnnumInterestRate,
+    decimal MonthlyInterestRate,
     decimal TotalRepayments,
     int EstablishmentFee,
     decimal TotalInterest);

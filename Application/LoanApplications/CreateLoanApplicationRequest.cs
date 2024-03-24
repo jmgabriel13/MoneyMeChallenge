@@ -1,5 +1,8 @@
 ﻿namespace Application.LoanApplications;
 public sealed record CreateLoanApplicationRequest(
     Guid CustomerId,
-    Guid ProductId,
-    decimal Repayments);
+    string RepaymentFrequency,
+    decimal Repayment,
+    decimal TotalRepayments,
+    decimal InterestRate,
+    decimal Interest);

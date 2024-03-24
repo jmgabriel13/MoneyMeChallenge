@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Domain.Entities.Blacklists;
 using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
 using Domain.Entities.Loans;
@@ -17,6 +18,7 @@ public sealed class ApplicationDbContext : DbContext, IApplicationDbContext, IUn
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Product> Products { get; set; }
     public DbSet<Loan> Loans { get; set; }
+    public DbSet<Blacklist> Blacklists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -111,12 +111,21 @@ public class CustomerService : ICustomerService
         }
 
         // calculate the monthly repayment amount using PMT function
-        double monthlyRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
+        // first convert PerAnnumInterestRate to a decimal value then divide it by 12months(1yr)
+        double monthlyInterestRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
         double monthlyPayment = -Financial.Pmt(
-            monthlyRate,
-            (double)(customer.Loan.Term * (int)RepaymentFrequency.Monthly),
+            monthlyInterestRate,
+            customer.Loan.TermInMonths,
             customer.Loan.AmountRequired);
-        decimal totalRepayments = (decimal)monthlyPayment * (customer.Loan.Term * (int)RepaymentFrequency.Monthly);
+        decimal totalRepayments = (decimal)monthlyPayment * customer.Loan.TermInMonths;
+
+        // Check if theres a month(s) of free interest in product.
+        if (product.MonthsOfFreeInterest > 0)
+        {
+            // Then minus the monthlyPayment multiply by MonthsOfFreeInterest to totalRepaymens
+            // To get only the sum of monthlyPayment that has a interest.
+            totalRepayments -= (decimal)monthlyPayment * product.MonthsOfFreeInterest;
+        }
 
         var quote = new CustomerQuoteResponse(
             customer.FirstName,
@@ -127,7 +136,9 @@ public class CustomerService : ICustomerService
             customer.Loan.TermInMonths,
             (decimal)monthlyPayment,
             nameof(RepaymentFrequency.Monthly),
-            totalRepayments,
+            product.PerAnnumInterestRate,
+            (decimal)monthlyInterestRate,
+            totalRepayments + 300,
             300,
             totalRepayments - customer.Loan.AmountRequired);
 

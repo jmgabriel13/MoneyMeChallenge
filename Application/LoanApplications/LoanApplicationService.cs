@@ -1,8 +1,8 @@
 ﻿using Application.Customers;
 using Application.Interfaces;
 using Application.Products;
+using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
-using Microsoft.VisualBasic;
 
 namespace Application.LoanApplications;
 public class LoanApplicationService : ILoanApplicationService
@@ -27,37 +27,31 @@ public class LoanApplicationService : ILoanApplicationService
     public async Task Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
-        var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
 
-        if (customer is null || product is null)
+        if (customer is null)
         {
-            // Return error, cant proceed if customer or product are not found
             return;
         }
 
-        // calculate the monthly repayment amount using PMT function
-        double monthlyRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
-        double monthlyPayment = -Financial.Pmt(
-            monthlyRate,
-            (double)(customer.Loan.Term * (int)RepaymentFrequency.Monthly),
-            customer.Loan.AmountRequired);
-        decimal totalRepayments = (decimal)monthlyPayment * (customer.Loan.Term * (int)RepaymentFrequency.Monthly);
+        // Perform applicant checking
+        if (!IsEligible(customer))
+        {
+            // Not eligible error message
+            return;
+        }
 
         // Creating instance of loanApplication
         var loanApplication = new LoanApplicaton
         {
             Id = Guid.NewGuid(),
             CustomerId = request.CustomerId,
-            RepaymentFrequency = nameof(RepaymentFrequency.Monthly),
-            Repayment = (decimal)monthlyPayment,
-            TotalRepayments = totalRepayments,
-            InterestRate = product.PerAnnumInterestRate / (int)RepaymentFrequency.Monthly,
-            Interest = totalRepayments - customer.Loan.AmountRequired,
+            RepaymentFrequency = request.RepaymentFrequency,
+            Repayment = request.Repayment,
+            TotalRepayments = request.TotalRepayments,
+            InterestRate = request.InterestRate,
+            Interest = request.Interest,
             Status = LoanStatus.Pending
         };
-
-        // Add establishmentFee to TotalRepayments
-        loanApplication.TotalRepayments += loanApplication.EstablishmentFee;
 
         _loanApplicationRepository.Add(loanApplication);
 
@@ -65,4 +59,43 @@ public class LoanApplicationService : ILoanApplicationService
 
         return;
     }
+
+    public static bool IsEligible(Customer customer)
+    {
+        // Check if the customer is at least 18 years old
+        if (DateTime.Today.AddYears(-18) < customer.DateOfBirth)
+        {
+            return false;
+        }
+
+        // Check if the mobile number is blacklisted
+        if (BlacklistedMobileNumbers.Contains(customer.MobileNumber))
+        {
+            return false;
+        }
+
+        // Check if the email domain is blacklisted
+        string emailDomain = customer.Email.Split('@')[1];
+        if (BlacklistedDomains.Contains(emailDomain))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static readonly List<string> BlacklistedMobileNumbers =
+    [
+        // Add blacklisted mobile numbers here
+        "123456789",
+        "987654321"
+    ];
+
+    public static readonly List<string> BlacklistedDomains =
+    [
+        // Add blacklisted domains here
+        "flower.com.au",
+        "example.com",
+        "test.com"
+    ];
 }
