@@ -39,7 +39,7 @@ public class LoanApplicationService : ILoanApplicationService
         double monthlyRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
         double monthlyPayment = -Financial.Pmt(
             monthlyRate,
-            customer.Loan.Term * (int)RepaymentFrequency.Monthly,
+            (double)(customer.Loan.Term * (int)RepaymentFrequency.Monthly),
             customer.Loan.AmountRequired);
         decimal totalRepayments = (decimal)monthlyPayment * (customer.Loan.Term * (int)RepaymentFrequency.Monthly);
 
@@ -48,7 +48,7 @@ public class LoanApplicationService : ILoanApplicationService
         {
             Id = Guid.NewGuid(),
             CustomerId = request.CustomerId,
-            RepaymentFrequency = RepaymentFrequency.Monthly.ToString(),
+            RepaymentFrequency = nameof(RepaymentFrequency.Monthly),
             Repayment = (decimal)monthlyPayment,
             TotalRepayments = totalRepayments,
             InterestRate = product.PerAnnumInterestRate / (int)RepaymentFrequency.Monthly,

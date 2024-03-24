@@ -6,5 +6,6 @@ public sealed record CustomerLoanResponse(
     DateTime DateOfBirth,
     string MobileNumber,
     string Email,
-    int Term,
+    decimal Term,
+    int TermInMonths,
     int AmountRequired);

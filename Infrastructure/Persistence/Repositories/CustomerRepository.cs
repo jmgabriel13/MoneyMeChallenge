@@ -27,9 +27,9 @@ public sealed class CustomerRepository : ICustomerRepository
     public Task<Customer?> GetByFirstLastNameAndDateOfBirthAsync(string firstName, string lastName, DateTime dateOfBirth, CancellationToken cancellationToken = default)
     {
         return _context.Customers
-            .FirstOrDefaultAsync(
-            c => c.FirstName == firstName &&
-            c.LastName == lastName &&
+            .FirstOrDefaultAsync(c =>
+            c.FirstName.ToLower() == firstName.ToLower() &&
+            c.LastName.ToLower() == lastName.ToLower() &&
             c.DateOfBirth == dateOfBirth,
             cancellationToken: cancellationToken);
     }

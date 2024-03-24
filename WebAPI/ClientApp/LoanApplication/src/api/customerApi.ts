@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CustomerLoanDto } from "../models/customerLoanDto";
+import { CustomerLoanDto, CustomerLoanRate } from "../models/customerLoanDto";
 import { API_BASE_URL } from './../../config';
 
 const customerApi = {
@@ -12,7 +12,17 @@ const customerApi = {
             console.log(error);
             throw error;
         }
-    }
+    },
+
+    getCustomerRate: async (customerLoan: CustomerLoanRate): Promise<void> => {
+        try {
+            await axios.post<number>(`${API_BASE_URL}/api/customer/rate`, customerLoan);
+        } catch (error) {
+            console.log(error)
+            throw error;
+        }
+    },
+
 }
 
 export default customerApi;

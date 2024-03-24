@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240323034116_update_loan_entity_term_to_decimal")]
+    partial class update_loan_entity_term_to_decimal
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,9 +115,6 @@ namespace Infrastructure.Migrations
                     b.Property<decimal>("Term")
                         .HasColumnType("decimal(5,2)");
 
-                    b.Property<int>("TermInMonths")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId")
@@ -150,7 +150,7 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b4bdbbe5-ad86-4288-9274-0a63195ffb04"),
+                            Id = new Guid("76bbd944-5783-49f4-8ec0-51a5585a39d5"),
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product A",
@@ -158,7 +158,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fa6bf24b-cf0b-4cbd-b783-1547cf64a886"),
+                            Id = new Guid("8d646eba-bfd7-4472-a2bb-817a34f49230"),
                             MinimumDuration = 6,
                             MonthsOfFreeInterest = 2,
                             Name = "Product B",
@@ -166,7 +166,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("3e712e8d-1362-4ef4-bf30-d5cf947ca630"),
+                            Id = new Guid("21ed7847-e021-4680-97ff-98a2dd28e7ec"),
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product C",

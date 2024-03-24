@@ -4,6 +4,7 @@ using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240323020121_update_product_entity_to_be_more_flexible")]
+    partial class update_product_entity_to_be_more_flexible
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -109,10 +112,7 @@ namespace Infrastructure.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Term")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<int>("TermInMonths")
+                    b.Property<int>("Term")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -150,7 +150,7 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b4bdbbe5-ad86-4288-9274-0a63195ffb04"),
+                            Id = new Guid("9e6287bf-c582-4665-a847-37748d01fb6b"),
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product A",
@@ -158,15 +158,15 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("fa6bf24b-cf0b-4cbd-b783-1547cf64a886"),
-                            MinimumDuration = 6,
+                            Id = new Guid("2b065d0a-9c86-462e-aac1-6c8d9cab89de"),
+                            MinimumDuration = 1,
                             MonthsOfFreeInterest = 2,
                             Name = "Product B",
                             PerAnnumInterestRate = 9.20m
                         },
                         new
                         {
-                            Id = new Guid("3e712e8d-1362-4ef4-bf30-d5cf947ca630"),
+                            Id = new Guid("27b12ed1-92f9-4a03-8242-282581cc55cd"),
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product C",

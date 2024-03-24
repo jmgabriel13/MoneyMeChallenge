@@ -37,4 +37,18 @@ public class CustomerController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet]
+    [Route("quote")]
+    public async Task<IActionResult> GetCustomerQuote(CustomerQuoteRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _customerService.CalculateCustomerQuoteAsync(request, cancellationToken);
+
+        if (result is null)
+        {
+            return BadRequest();
+        }
+
+        return Ok(result);
+    }
 }

@@ -1,5 +1,7 @@
 export interface ProductDto {
     id: string,
     name: string,
-    perAnnumInterestRate: number
+    perAnnumInterestRate: number,
+    minimumDuration: number,
+    monthsOfFreeInterest: number
 }

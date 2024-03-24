@@ -21,19 +21,25 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
             {
                 Id = Guid.NewGuid(),
                 Name = "Product A",
-                PerAnnumInterestRate = 0
+                PerAnnumInterestRate = 0,
+                MinimumDuration = 1,
+                MonthsOfFreeInterest = 0
             },
             new Product
             {
                 Id = Guid.NewGuid(),
                 Name = "Product B",
-                PerAnnumInterestRate = 9.20M
+                PerAnnumInterestRate = 9.20M,
+                MinimumDuration = 6,
+                MonthsOfFreeInterest = 2
             },
             new Product
             {
                 Id = Guid.NewGuid(),
                 Name = "Product C",
-                PerAnnumInterestRate = 10.58M
+                PerAnnumInterestRate = 10.58M,
+                MinimumDuration = 1,
+                MonthsOfFreeInterest = 0
             }
         );
     }

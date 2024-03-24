@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom"
 import customerApi from "../../api/customerApi";
 import { CustomerLoanDto } from "../../models/customerLoanDto";
-import { Box, Button, Grid, TextField, Typography, Container, MenuItem, Stack, Slider, Paper, FormControl, FormHelperText } from "@mui/material";
+import { Box, Button, Grid, TextField, Typography, Container, MenuItem, Stack, Slider, Paper, FormControl, FormHelperText, Autocomplete } from "@mui/material";
 import Information from "../Information/Information";
 import { DatePicker } from "@mui/x-date-pickers";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
@@ -35,7 +35,7 @@ const amounts = [
 const terms = [
     {
         label: '1mo',
-        value: 1,
+        value: 0,
     },
     {
         label: '6mos',
@@ -47,22 +47,63 @@ const terms = [
     },
 ];
 
+function InitializeCustomerLoanDto(): Partial<CustomerLoanDto> {
+    return {
+        firstName: '',
+        lastName: '',
+        mobileNumber: '',
+        email: ''
+    }
+}
+
+function monthsToYears(months: number): number {
+    if (months < 0) {
+        return 1 / 12;
+    }
+
+    return months / 12;
+}
+
 export default function QuoteCalculator() {
     const [searchParams] = useSearchParams();
     const id = searchParams.get('customerId')
     const [products, setProducts] = useState<ProductDto[]>([])
+    const [product, setProduct] = useState<ProductDto | null>({
+        id: '',
+        name: '',
+        perAnnumInterestRate: 0,
+        minimumDuration: 0,
+        monthsOfFreeInterest: 0
+    })
 
     // Get values from api
     const { control, handleSubmit } = useForm({
-        defaultValues: async () => await customerApi.getCustomerLoanById(id!).then((customerLoanData) => {
-            console.log(customerLoanData)
-            return customerLoanData!
-        })
+        defaultValues: async () => 
+                id ? await customerApi.getCustomerLoanById(id!).then((customerLoanData) => {return customerLoanData!}) : InitializeCustomerLoanDto()
     })
 
-    const onSubmit: SubmitHandler<CustomerLoanDto> = (data) => {
+    const onSubmit: SubmitHandler<Partial<CustomerLoanDto>> = (data) => {
         console.log(data)
-        console.log(new Date(data.dateOfBirth))
+
+        if (id) {
+            // Should call the api that calcualte quote using PMT Function
+
+        } else {
+            const request = {
+                title: data.title!,
+                firstName: data.firstName!,
+                lastName: data.lastName!,
+                dateOfBirth: new Date(data.dateOfBirth!)!,
+                mobileNumber: data.mobileNumber!,
+                email: data.email!,
+                term: monthsToYears(data.termInMonths!).toString(),
+                amountRequired: data.amountRequired!.toString()
+            }
+    
+            console.log(request)
+    
+            customerApi.getCustomerRate(request).then((response) => console.log(response));
+        }
     }
 
     function valueText(value: number) {
@@ -88,31 +129,39 @@ export default function QuoteCalculator() {
                         Quote calculator
                     </Typography>
                     <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3, flexGrow: 1 }}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={12}>
-                                <Grid item xs={5} sm={2}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} display="flex" justifyContent="center">
+                                <Grid item xs={6}>
                                     <Controller
                                         name="product"
+                                        rules={{
+                                            required: "Please choose products"
+                                        }}
                                         control={control}
-                                        render={({ field: { onChange, onBlur, value } }) => 
-                                            <FormControl fullWidth>
-                                                <TextField
+                                        render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                            <FormControl fullWidth error={!!error}>
+                                                <Autocomplete
                                                     id="product"
-                                                    select
-                                                    label="Product"
-                                                    onChange={(newValue) => {
+                                                    options={products}
+                                                    value={value ? products.find((product) => {return value === product.id}) ?? null : null}
+                                                    getOptionLabel={(product) => {
+                                                        return product.name
+                                                    }}
+                                                    onChange={(event: unknown, newValue) => {
                                                         console.log(newValue)
-                                                        onChange(newValue ? newValue : null)
+                                                        setProduct(newValue)
+                                                        onChange(newValue ? newValue.id : null)
                                                     }}
                                                     onBlur={onBlur}
-                                                    value={value ? products.find((product) => { return value === product.id }) ?? "" : ""}
-                                                >
-                                                    {products.map((option) => (
-                                                        <MenuItem key={option.id} value={option.id}>
-                                                            {option.name}
-                                                        </MenuItem>
-                                                    ))}
-                                                </TextField>
+                                                    renderInput={(params) => (
+                                                        <TextField 
+                                                            {...params}
+                                                            label="Products"
+                                                            inputRef={ref}
+                                                        />
+                                                    )}
+                                                />
+                                                {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                             </FormControl>
                                         }
                                     />
@@ -147,7 +196,7 @@ export default function QuoteCalculator() {
                             </Grid>
                             <Grid item xs={12}>
                                 <Controller
-                                    name="term"
+                                    name="termInMonths"
                                     control={control}
                                     render={({ field: { onChange, onBlur, value } }) => 
                                         <FormControl fullWidth>
@@ -155,17 +204,17 @@ export default function QuoteCalculator() {
                                                 Term
                                             </Typography>
                                             <Slider
-                                                name="term"
+                                                name="termInMonths"
                                                 aria-label="Term"
                                                 defaultValue={0}
                                                 onChange={onChange}
                                                 onBlur={onBlur}
-                                                value={value ?? 0}
+                                                value={value ?? 6}
                                                 getAriaValueText={valueText}
                                                 step={6}
                                                 valueLabelDisplay="on"
                                                 marks={terms}
-                                                min={1}
+                                                min={product?.minimumDuration === 1 ? 0 : product?.minimumDuration}
                                                 max={36}
                                             />
                                         </FormControl>
@@ -177,9 +226,12 @@ export default function QuoteCalculator() {
                                     <Grid item xs={5} sm={2}>
                                         <Controller
                                             name="title"
+                                            rules={{
+                                                required: "Title is required"
+                                            }}
                                             control={control}
-                                            render={({ field: { onChange, onBlur, value } }) => 
-                                                <FormControl fullWidth>
+                                            render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                                <FormControl fullWidth error={!!error}>
                                                     <TextField
                                                         id="title"
                                                         select
@@ -188,6 +240,7 @@ export default function QuoteCalculator() {
                                                         onChange={onChange}
                                                         onBlur={onBlur}
                                                         value={value ?? "Mr."}
+                                                        inputRef={ref}
                                                     >
                                                         {title.map((option) => (
                                                             <MenuItem key={option.value} value={option.value}>
@@ -195,6 +248,7 @@ export default function QuoteCalculator() {
                                                             </MenuItem>
                                                         ))}
                                                     </TextField>
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
                                             }
                                         />
@@ -202,8 +256,11 @@ export default function QuoteCalculator() {
                                     <Grid item xs={7} sm={5}>
                                         <Controller
                                             name="firstName"
+                                            rules={{
+                                                required: "First Name is required"
+                                            }}
                                             control={control}
-                                            render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => 
+                                            render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
                                                 <FormControl fullWidth error={!!error}>
                                                     <TextField
                                                         name="firstName"
@@ -215,8 +272,9 @@ export default function QuoteCalculator() {
                                                         onChange={onChange}
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
+                                                        inputRef={ref}
                                                     />
-                                                    {error?.message ? <FormHelperText>error?.message</FormHelperText> : null }
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
                                             }
                                         />
@@ -224,9 +282,12 @@ export default function QuoteCalculator() {
                                     <Grid item xs={12} sm={5}>
                                         <Controller
                                             name="lastName"
+                                            rules={{
+                                                required: "Last Name is required"
+                                            }}
                                             control={control}
-                                            render={({ field: { onChange, onBlur, value } }) => 
-                                                <FormControl fullWidth>
+                                            render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                                <FormControl fullWidth error={!!error}>
                                                     <TextField
                                                         required
                                                         fullWidth
@@ -236,7 +297,9 @@ export default function QuoteCalculator() {
                                                         onChange={onChange}
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
+                                                        inputRef={ref}
                                                     />
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
                                             }
                                         />
@@ -246,9 +309,12 @@ export default function QuoteCalculator() {
                             <Grid item xs={12}>
                                 <Controller
                                     name="email"
+                                    rules={{
+                                        required: "Email is required"
+                                    }}
                                     control={control}
-                                    render={({ field: { onChange, onBlur, value } }) => 
-                                        <FormControl fullWidth>
+                                    render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                        <FormControl fullWidth error={!!error}>
                                             <TextField
                                                 required
                                                 fullWidth
@@ -259,7 +325,9 @@ export default function QuoteCalculator() {
                                                 onChange={onChange}
                                                 onBlur={onBlur}
                                                 value={value ?? ""}
+                                                inputRef={ref}
                                             />
+                                            {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                         </FormControl>
                                     }
                                 />
@@ -269,9 +337,12 @@ export default function QuoteCalculator() {
                                     <Grid item xs={12} sm={7}>
                                         <Controller
                                             name="mobileNumber"
+                                            rules={{
+                                                required: "Mobile Number is required"
+                                            }}
                                             control={control}
-                                            render={({ field: { onChange, onBlur, value } }) => 
-                                                <FormControl fullWidth>
+                                            render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                                <FormControl fullWidth error={!!error}>
                                                     <TextField
                                                         required
                                                         fullWidth
@@ -281,7 +352,9 @@ export default function QuoteCalculator() {
                                                         onChange={onChange}
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
+                                                        inputRef={ref}
                                                     />
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
                                             }
                                         />
@@ -289,15 +362,20 @@ export default function QuoteCalculator() {
                                     <Grid item>
                                         <Controller
                                             name="dateOfBirth"
+                                            rules={{
+                                                required: "Date of Birth is required"
+                                            }}
                                             control={control}
-                                            render={({ field: { onChange, value } }) => 
-                                                <FormControl fullWidth>
+                                            render={({ field: { onChange, value, ref }, fieldState: { error } }) => 
+                                                <FormControl fullWidth error={!!error}>
                                                     <DatePicker 
                                                         label="Date of Birth"
                                                         name="dateOfBirth"
                                                         onChange={onChange}
                                                         value={dayjs(value) ?? ""}
+                                                        inputRef={ref}
                                                     />
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
                                             }
                                         />
