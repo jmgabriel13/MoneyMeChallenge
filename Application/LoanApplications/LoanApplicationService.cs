@@ -3,38 +3,25 @@ using Application.Customers;
 using Application.Interfaces;
 using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
+using Domain.Errors;
+using Domain.Shared;
 
 namespace Application.LoanApplications;
-public class LoanApplicationService : ILoanApplicationService
+public sealed class LoanApplicationService(
+    ILoanApplicationRepository _loanApplicationRepository,
+    ICustomerRepository _customerRepository,
+    IBlacklistedEmailDomainRepository _emailDomainRepository,
+    IBlacklistedMobileNumberRepository _mobileNumberRepository,
+    IUnitOfWork _unitOfWork) : ILoanApplicationService
 {
-    private readonly ILoanApplicationRepository _loanApplicationRepository;
-    private readonly ICustomerRepository _customerRepository;
-    private readonly IBlacklistedEmailDomainRepository _emailDomainRepository;
-    private readonly IBlacklistedMobileNumberRepository _mobileNumberRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public LoanApplicationService(
-        ILoanApplicationRepository loanApplicationRepository,
-        IUnitOfWork unitOfWork,
-        ICustomerRepository customerRepository,
-        IBlacklistedEmailDomainRepository emailDomainRepository,
-        IBlacklistedMobileNumberRepository mobileNumberRepository)
-    {
-        _loanApplicationRepository = loanApplicationRepository;
-        _unitOfWork = unitOfWork;
-        _customerRepository = customerRepository;
-        _emailDomainRepository = emailDomainRepository;
-        _mobileNumberRepository = mobileNumberRepository;
-    }
-
-    public async Task Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
+    public async Task<Result> Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
 
         if (customer is null)
         {
             // Return error customer not found
-            return;
+            return Result.Failure(DomainErrors.Customer.CustomerNotFound(request.CustomerId));
         }
 
         // Check if customer has a pending loan application
@@ -43,34 +30,32 @@ public class LoanApplicationService : ILoanApplicationService
             cancellationToken))
         {
             // Return error that customer has a pending loan application
-            return;
+            return Result.Failure(DomainErrors.Customer.HasPendingLoanApplication);
         }
 
         // Perform customer eligibility
         if (!await IsEligibleAsync(customer))
         {
             // Not eligible error message
-            return;
+            return Result.Failure(DomainErrors.Customer.NotEligible);
         }
 
         // Creating instance of loanApplication
-        var loanApplication = new LoanApplicaton
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = request.CustomerId,
-            RepaymentFrequency = request.RepaymentFrequency,
-            Repayment = request.Repayment,
-            TotalRepayments = request.TotalRepayments,
-            InterestRate = request.InterestRate,
-            Interest = request.Interest,
-            Status = LoanStatus.Pending
-        };
+        var loanApplication = LoanApplicaton.Create(
+            Guid.NewGuid(),
+            request.CustomerId,
+            request.RepaymentFrequency,
+            request.Repayment,
+            request.TotalRepayments,
+            request.InterestRate,
+            request.Interest,
+            LoanStatus.Pending);
 
         _loanApplicationRepository.Add(loanApplication);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return;
+        return Result.Success();
     }
 
     public async Task<bool> IsEligibleAsync(Customer customer)

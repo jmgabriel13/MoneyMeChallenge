@@ -1,5 +1,5 @@
-﻿namespace Application.Customers;
-public sealed record CreateLoanCustomerRateRequest(
+﻿namespace Application.Customers.CreateCustomerLoanRate;
+public sealed record CreateCustomerLoanRateRequest(
     string Title,
     string FirstName,
     string LastName,

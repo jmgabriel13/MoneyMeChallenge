@@ -1,4 +1,6 @@
-﻿using Application.Customers;
+﻿using Application.Customers.CalculateCustomerQuote;
+using Application.Customers.CreateCustomerLoanRate;
+using Application.Customers.GetCustomerLoanById;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Abstraction;
@@ -6,13 +8,13 @@ using WebApp.Abstraction;
 namespace WebApp.Controllers;
 
 [Route("api/customers")]
-public sealed class CustomerController(ICustomerService _customerService) : ApiController
+public sealed class CustomerController : ApiController
 {
     [HttpGet]
     [Route("loan/{customerId:guid}")]
     public async Task<IActionResult> GetCustomerLoanById(Guid customerId, CancellationToken cancellationToken)
     {
-        Result result = await _customerService.FindCustomerLoanByIdAsync(customerId, cancellationToken);
+        Result result = await Mediator.Send(new GetCustomerLoanByIdQuery(customerId), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -24,11 +26,22 @@ public sealed class CustomerController(ICustomerService _customerService) : ApiC
 
     [HttpPost]
     [Route("rate")]
-    public async Task<IActionResult> CustomerRate([FromBody] CreateLoanCustomerRateRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> CustomerRate([FromBody] CreateCustomerLoanRateRequest request, CancellationToken cancellationToken)
     {
         var redirectURL = $"{Request.Scheme}://{Request.Host}";
 
-        Result result = await _customerService.Create(request, redirectURL, cancellationToken);
+        var command = new CreateCustomerLoanRateCommand(
+            request.Title,
+            request.FirstName,
+            request.LastName,
+            request.DateOfBirth,
+            request.MobileNumber,
+            request.Email,
+            request.Term,
+            request.AmountRequired,
+            redirectURL);
+
+        Result result = await Mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -40,9 +53,9 @@ public sealed class CustomerController(ICustomerService _customerService) : ApiC
 
     [HttpGet]
     [Route("quote")]
-    public async Task<IActionResult> GetCustomerQuote(CustomerQuoteRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetCustomerQuote(CalculateCustomerQuoteRequest request, CancellationToken cancellationToken)
     {
-        Result result = await _customerService.CalculateCustomerQuoteAsync(request, cancellationToken);
+        Result result = await Mediator.Send(request, cancellationToken);
 
         if (result.IsFailure)
         {

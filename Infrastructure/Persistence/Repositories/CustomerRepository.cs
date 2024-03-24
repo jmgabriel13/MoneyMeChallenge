@@ -3,15 +3,9 @@ using Domain.Entities.Customers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
-public sealed class CustomerRepository : ICustomerRepository
+public sealed class CustomerRepository(
+    ApplicationDbContext _context) : ICustomerRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public CustomerRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public void Add(Customer customer)
     {
         _context.Add(customer);
@@ -30,16 +24,6 @@ public sealed class CustomerRepository : ICustomerRepository
             .FirstOrDefaultAsync(c =>
             c.FirstName.ToLower() == firstName.ToLower() &&
             c.LastName.ToLower() == lastName.ToLower() &&
-            c.DateOfBirth == dateOfBirth,
-            cancellationToken: cancellationToken);
-    }
-
-    public Task<bool> IsCustomerExist(string firstName, string lastName, DateTime dateOfBirth, CancellationToken cancellationToken = default)
-    {
-        return _context.Customers
-            .AnyAsync(
-            c => c.FirstName == firstName &&
-            c.LastName == lastName &&
             c.DateOfBirth == dateOfBirth,
             cancellationToken: cancellationToken);
     }

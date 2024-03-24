@@ -1,5 +1,5 @@
 ﻿namespace Application.Customers;
-public record CustomerQuoteResponse(
+public sealed record CustomerQuoteResponse(
     string FirstName,
     string LastName,
     string MobileNumber,

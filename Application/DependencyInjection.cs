@@ -1,5 +1,4 @@
-﻿using Application.Customers;
-using Application.LoanApplications;
+﻿using Application.LoanApplications;
 using Application.Products;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +14,6 @@ public static class DependencyInjection
             configuration.RegisterServicesFromAssemblies(assembly);
         });
 
-        services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ILoanApplicationService, LoanApplicationService>();
         services.AddScoped<IProductService, ProductService>();
 

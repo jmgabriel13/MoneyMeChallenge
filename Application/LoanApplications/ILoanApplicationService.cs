@@ -1,5 +1,7 @@
-﻿namespace Application.LoanApplications;
+﻿using Domain.Shared;
+
+namespace Application.LoanApplications;
 public interface ILoanApplicationService
 {
-    Task Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken = default);
+    Task<Result> Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,5 @@
 ﻿namespace Application.Products.Update;
-public record UpdateProductRequest(
+public sealed record UpdateProductRequest(
     string Name,
     decimal PerAnnumInterestRate,
     int MinimumDuration,

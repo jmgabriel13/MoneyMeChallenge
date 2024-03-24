@@ -2,7 +2,7 @@
 
 namespace Application.Products.Update;
 
-public record UpdateProductCommand(
+public sealed record UpdateProductCommand(
     Guid Id,
     string Name,
     decimal PerAnnumInterestRate,
