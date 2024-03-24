@@ -6,15 +6,15 @@ using Domain.Entities.LoanApplications;
 using Domain.Errors;
 using Domain.Shared;
 
-namespace Application.LoanApplications;
-public sealed class LoanApplicationService(
+namespace Application.LoanApplications.CreateLoanApplication;
+internal sealed class CreateLoanApplicationHandler(
     ILoanApplicationRepository _loanApplicationRepository,
     ICustomerRepository _customerRepository,
     IBlacklistedEmailDomainRepository _emailDomainRepository,
     IBlacklistedMobileNumberRepository _mobileNumberRepository,
-    IUnitOfWork _unitOfWork) : ILoanApplicationService
+    IUnitOfWork _unitOfWork) : ICommandHandler<CreateLoanApplicationRequest>
 {
-    public async Task<Result> Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
 

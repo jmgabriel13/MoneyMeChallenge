@@ -3,7 +3,8 @@ using Domain.Entities.Blacklists;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
-public sealed class BlacklistedEmailDomainRepository(ApplicationDbContext _context) : IBlacklistedEmailDomainRepository
+public sealed class BlacklistedEmailDomainRepository(
+    ApplicationDbContext _context) : IBlacklistedEmailDomainRepository
 {
     public void Add(BlacklistedEmailDomain emailDomain)
     {

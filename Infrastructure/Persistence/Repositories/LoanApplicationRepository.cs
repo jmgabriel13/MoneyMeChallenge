@@ -3,15 +3,9 @@ using Domain.Entities.LoanApplications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
-public sealed class LoanApplicationRepository : ILoanApplicationRepository
+public sealed class LoanApplicationRepository(
+    ApplicationDbContext _context) : ILoanApplicationRepository
 {
-    private readonly ApplicationDbContext _context;
-
-    public LoanApplicationRepository(ApplicationDbContext context)
-    {
-        _context = context;
-    }
-
     public void Add(LoanApplicaton loanApplicaton)
     {
         _context.Add(loanApplicaton);

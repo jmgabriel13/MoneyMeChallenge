@@ -1,24 +1,24 @@
-﻿using Application.LoanApplications;
+﻿using Application.LoanApplications.CreateLoanApplication;
+using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
+using WebApp.Abstraction;
 
 namespace WebApp.Controllers;
 
 [Route("api/loan")]
-public sealed class LoanApplicationController : Controller
+public sealed class LoanApplicationController : ApiController
 {
-    private readonly ILoanApplicationService _loanApplicationService;
-
-    public LoanApplicationController(ILoanApplicationService loanApplicationService)
-    {
-        _loanApplicationService = loanApplicationService;
-    }
-
     [HttpPost]
     [Route("application")]
     public async Task<IActionResult> LoanApplication([FromBody] CreateLoanApplicationRequest request, CancellationToken cancellationToken)
     {
-        await _loanApplicationService.Create(request, cancellationToken);
+        Result result = await Mediator.Send(request, cancellationToken);
 
-        return Ok();
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
+        return Ok(result);
     }
 }

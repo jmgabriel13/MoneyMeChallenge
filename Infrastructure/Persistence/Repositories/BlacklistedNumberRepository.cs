@@ -3,7 +3,8 @@ using Domain.Entities.Blacklists;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
-public sealed class BlacklistedNumberRepository(ApplicationDbContext _context) : IBlacklistedMobileNumberRepository
+public sealed class BlacklistedNumberRepository(
+    ApplicationDbContext _context) : IBlacklistedMobileNumberRepository
 {
     public void Add(BlacklistedMobileNumber number)
     {
@@ -27,7 +28,7 @@ public sealed class BlacklistedNumberRepository(ApplicationDbContext _context) :
 
     public void Update(BlacklistedMobileNumber number)
     {
-        _context.Entry(number).State = EntityState.Modified;
+        _context.Update(number);
     }
 
     public void Delete(BlacklistedMobileNumber number)
