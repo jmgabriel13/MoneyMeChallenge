@@ -14,7 +14,8 @@ internal sealed class CreateProductCommandHandler(
             request.Name,
             request.PerAnnumInterestRate,
             request.MinimumDuration,
-            request.MonthsOfFreeInterest);
+            request.MonthsOfFreeInterest,
+            request.EstablishmentFee);
 
         _productRepository.Add(product);
 

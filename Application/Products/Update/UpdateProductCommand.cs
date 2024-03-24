@@ -7,4 +7,5 @@ public record UpdateProductCommand(
     string Name,
     decimal PerAnnumInterestRate,
     int MinimumDuration,
-    int MonthsOfFreeInterest) : ICommand;
+    int MonthsOfFreeInterest,
+    int EstablishmentFee) : ICommand;

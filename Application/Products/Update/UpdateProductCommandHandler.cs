@@ -20,7 +20,8 @@ internal sealed class UpdateProductCommandHandler(
             request.Name,
             request.PerAnnumInterestRate,
             request.MinimumDuration,
-            request.MonthsOfFreeInterest);
+            request.MonthsOfFreeInterest,
+            request.EstablishmentFee);
 
         _productRepository.Update(product);
 

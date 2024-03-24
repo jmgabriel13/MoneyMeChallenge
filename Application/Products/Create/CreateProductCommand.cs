@@ -5,4 +5,5 @@ public record CreateProductCommand(
     string Name,
     decimal PerAnnumInterestRate,
     int MinimumDuration,
-    int MonthsOfFreeInterest) : ICommand;
+    int MonthsOfFreeInterest,
+    int EstablishmentFee) : ICommand;

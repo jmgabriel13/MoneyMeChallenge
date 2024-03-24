@@ -22,19 +22,22 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
                 "Product A",
                 0,
                 1,
-                0),
+                0,
+                300),
             new Product(
                 Guid.NewGuid(),
                 "Product B",
                 9.20M,
                 6,
-                2),
+                2,
+                300),
             new Product(
                 Guid.NewGuid(),
                 "Product C",
                 10.58M,
                 1,
-                0)
+                0,
+                300)
         );
     }
 }

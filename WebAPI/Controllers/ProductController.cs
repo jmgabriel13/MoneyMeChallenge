@@ -47,7 +47,8 @@ public sealed class ProductController(IProductService _productService) : ApiCont
             request.Name,
             request.PerAnnumInterestRate,
             request.MinimumDuration,
-            request.MonthsOfFreeInterest);
+            request.MonthsOfFreeInterest,
+            request.EstablishmentFee);
 
         Result result = await Mediator.Send(command, cancellationToken);
 

@@ -3,4 +3,5 @@ public record UpdateProductRequest(
     string Name,
     decimal PerAnnumInterestRate,
     int MinimumDuration,
-    int MonthsOfFreeInterest);
+    int MonthsOfFreeInterest,
+    int EstablishmentFee);

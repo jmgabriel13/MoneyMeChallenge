@@ -115,8 +115,8 @@ public sealed class CustomerService(
             nameof(RepaymentFrequency.Monthly),
             product.PerAnnumInterestRate,
             (decimal)monthlyInterestRate,
-            totalRepayments + 300,
-            300,
+            totalRepayments + product.EstablishmentFee,
+            product.EstablishmentFee,
             totalRepayments - customer.Loan.AmountRequired);
 
         return Result.Success(quote);
