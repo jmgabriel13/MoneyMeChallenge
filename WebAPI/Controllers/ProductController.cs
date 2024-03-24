@@ -8,7 +8,7 @@ using WebApp.Abstraction;
 
 namespace WebApp.Controllers;
 
-[Route("api/product")]
+[Route("api/products")]
 public sealed class ProductController(IProductService _productService) : ApiController
 {
     [HttpPost]
@@ -17,19 +17,29 @@ public sealed class ProductController(IProductService _productService) : ApiCont
     {
         Result result = await Mediator.Send(command, cancellationToken);
 
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
         return Ok(result);
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllProducts(CancellationToken cancellationToken)
     {
-        var products = await _productService.GetAllProducts(cancellationToken);
+        Result result = await _productService.GetAllProducts(cancellationToken);
 
-        return Ok(products);
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
+        return Ok(result);
     }
 
     [HttpPut]
-    [Route("update{id:guid}")]
+    [Route("update/{id:guid}")]
     public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] UpdateProductRequest request, CancellationToken cancellationToken)
     {
         var command = new UpdateProductCommand(

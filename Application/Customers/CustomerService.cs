@@ -2,33 +2,21 @@
 using Application.Products;
 using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
-using Domain.Entities.Loans;
+using Domain.Shared;
 using Microsoft.VisualBasic;
 
 namespace Application.Customers;
-public class CustomerService : ICustomerService
+public sealed class CustomerService(
+    ICustomerRepository _customerRepository,
+    IProductRepository _productRepository,
+    IUnitOfWork _unitOfWork) : ICustomerService
 {
-    private readonly ICustomerRepository _customerRepository;
-    private readonly IProductRepository _productRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public CustomerService(
-        ICustomerRepository customerRepository,
-        IUnitOfWork unitOfWork,
-        IProductRepository productRepository)
-    {
-        _customerRepository = customerRepository;
-        _unitOfWork = unitOfWork;
-        _productRepository = productRepository;
-    }
-
-    public async Task<string> Create(CreateLoanCustomerRateRequest request, string redirectUrl, CancellationToken cancellationToken)
+    public async Task<Result<string>> Create(CreateLoanCustomerRateRequest request, string redirectUrl, CancellationToken cancellationToken)
     {
         bool isValidDate = DateTime.TryParse(request.DateOfBirth, out DateTime parsedDate);
         if (!isValidDate)
         {
-            // Return 
-            return "Date of Birth is not valid.";
+            return Result.Failure<string>(new Error("Customer.DateOfBirth", "Date of Birth is not valid"));
         }
 
         // Check if firstName, lastName and dateOfBirth is existing, then return same redirect URL
@@ -41,47 +29,36 @@ public class CustomerService : ICustomerService
         if (customer is not null)
         {
             // If customer is existing using firstName, lastName and dateOfbirth, return same redirectUrl
-            return customer.RedirectURL;
+            return Result.Success(customer.RedirectURL);
         }
 
-        // Creating instance of loan
-        var loan = new Loan
-        {
-            Id = Guid.NewGuid(),
-            Term = decimal.Parse(request.Term),
-            TermInMonths = YearsToMonths(decimal.Parse(request.Term)),
-            AmountRequired = Int32.Parse(request.AmountRequired)
-        };
-
-        // Creating new customer
-        var newCustomerId = Guid.NewGuid();
-        var newCustomer = new Customer
-        {
-            Id = newCustomerId,
-            Title = request.Title,
-            FirstName = request.FirstName,
-            LastName = request.LastName,
-            DateOfBirth = parsedDate,
-            MobileNumber = request.MobileNumber,
-            Email = request.Email,
-            RedirectURL = $"{redirectUrl}/quote-calculator?customerId={newCustomerId}",
-            Loan = loan
-        };
+        // Creating new customer with loan
+        var newCustomer = Customer.Create(
+            Guid.NewGuid(),
+            request.Title,
+            request.FirstName,
+            request.LastName,
+            parsedDate,
+            request.MobileNumber,
+            request.Email,
+            redirectUrl,
+            request.Term,
+            request.AmountRequired);
 
         _customerRepository.Add(newCustomer);
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return newCustomer.RedirectURL;
+        return Result.Success(newCustomer.RedirectURL);
     }
 
-    public async Task<CustomerLoanResponse?> FindCustomerLoanByIdAsync(Guid customerId, CancellationToken cancellationToken = default)
+    public async Task<Result<CustomerLoanResponse>> FindCustomerLoanByIdAsync(Guid customerId, CancellationToken cancellationToken = default)
     {
         var customer = await _customerRepository.FindByIdAsync(customerId, cancellationToken);
 
         if (customer is null)
         {
-            throw new InvalidOperationException("Customer not found");
+            return Result.Failure<CustomerLoanResponse>(new Error("Customer.NotFound", "Customer not founnd"));
         }
 
         // Customer response object
@@ -96,10 +73,10 @@ public class CustomerService : ICustomerService
             customer.Loan.TermInMonths,
             customer.Loan.AmountRequired);
 
-        return response;
+        return Result.Success(response);
     }
 
-    public async Task<CustomerQuoteResponse?> CalculateCustomerQuoteAsync(CustomerQuoteRequest request, CancellationToken cancellationToken = default)
+    public async Task<Result<CustomerQuoteResponse>> CalculateCustomerQuoteAsync(CustomerQuoteRequest request, CancellationToken cancellationToken = default)
     {
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
         var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
@@ -107,7 +84,7 @@ public class CustomerService : ICustomerService
         if (customer is null || product is null)
         {
             // Return error, cant proceed if customer or product are not found
-            throw new InvalidOperationException("Customer or product not found");
+            return Result.Failure<CustomerQuoteResponse>(new Error("Customer.Calculate.Quote", "Customer or product not found"));
         }
 
         // calculate the monthly repayment amount using PMT function
@@ -142,16 +119,6 @@ public class CustomerService : ICustomerService
             300,
             totalRepayments - customer.Loan.AmountRequired);
 
-        return quote;
-    }
-
-    public static int YearsToMonths(decimal years)
-    {
-        if (years < 0)
-        {
-            throw new ArgumentException("Invalid input: Please provide a non-negative number of years.", nameof(years));
-        }
-
-        return (int)Math.Round(years * 12);
+        return Result.Success(quote);
     }
 }

@@ -1,7 +1,9 @@
-﻿namespace Application.Customers;
+﻿using Domain.Shared;
+
+namespace Application.Customers;
 public interface ICustomerService
 {
-    Task<string> Create(CreateLoanCustomerRateRequest request, string redirectUrl, CancellationToken cancellationToken);
-    Task<CustomerLoanResponse?> FindCustomerLoanByIdAsync(Guid customerId, CancellationToken cancellationToken = default);
-    Task<CustomerQuoteResponse?> CalculateCustomerQuoteAsync(CustomerQuoteRequest request, CancellationToken cancellationToken = default);
+    Task<Result<string>> Create(CreateLoanCustomerRateRequest request, string redirectUrl, CancellationToken cancellationToken);
+    Task<Result<CustomerLoanResponse>> FindCustomerLoanByIdAsync(Guid customerId, CancellationToken cancellationToken = default);
+    Task<Result<CustomerQuoteResponse>> CalculateCustomerQuoteAsync(CustomerQuoteRequest request, CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,6 @@
 ﻿using Application.Products;
 using Domain.Entities.Product;
+using Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Persistence.Repositories;
@@ -13,7 +14,7 @@ public sealed class ProductRepository(ApplicationDbContext _context) : IProductR
     {
         return await _context.Products.FirstOrDefaultAsync(p => p.Id == Id, cancellationToken);
     }
-    public async Task<IReadOnlyCollection<Product>> GetAllProductsAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyCollection<Product>>> GetAllProductsAsync(CancellationToken cancellationToken = default)
     {
         return await _context.Products.OrderBy(p => p.Name).ToListAsync(cancellationToken);
     }

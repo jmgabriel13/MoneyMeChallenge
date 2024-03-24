@@ -1,27 +1,22 @@
 ﻿using Application.Customers;
+using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
+using WebApp.Abstraction;
 
 namespace WebApp.Controllers;
 
-[Route("api/customer")]
-public sealed class CustomerController : ControllerBase
+[Route("api/customers")]
+public sealed class CustomerController(ICustomerService _customerService) : ApiController
 {
-    private readonly ICustomerService _customerService;
-
-    public CustomerController(ICustomerService customerLoanRateService)
-    {
-        _customerService = customerLoanRateService;
-    }
-
     [HttpGet]
-    [Route("loan")]
+    [Route("loan/{customerId:guid}")]
     public async Task<IActionResult> GetCustomerLoanById(Guid customerId, CancellationToken cancellationToken)
     {
-        var result = await _customerService.FindCustomerLoanByIdAsync(customerId, cancellationToken);
+        Result result = await _customerService.FindCustomerLoanByIdAsync(customerId, cancellationToken);
 
-        if (result is null)
+        if (result.IsFailure)
         {
-            return BadRequest();
+            return HandleFailure(result);
         }
 
         return Ok(result);
@@ -33,7 +28,12 @@ public sealed class CustomerController : ControllerBase
     {
         var redirectURL = $"{Request.Scheme}://{Request.Host}";
 
-        var result = await _customerService.Create(request, redirectURL, cancellationToken);
+        Result result = await _customerService.Create(request, redirectURL, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
 
         return Ok(result);
     }
@@ -42,11 +42,11 @@ public sealed class CustomerController : ControllerBase
     [Route("quote")]
     public async Task<IActionResult> GetCustomerQuote(CustomerQuoteRequest request, CancellationToken cancellationToken)
     {
-        var result = await _customerService.CalculateCustomerQuoteAsync(request, cancellationToken);
+        Result result = await _customerService.CalculateCustomerQuoteAsync(request, cancellationToken);
 
-        if (result is null)
+        if (result.IsFailure)
         {
-            return BadRequest();
+            return HandleFailure(result);
         }
 
         return Ok(result);
