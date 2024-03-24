@@ -1,6 +1,6 @@
-﻿using Application.Customers;
+﻿using Application.Blacklists;
+using Application.Customers;
 using Application.Interfaces;
-using Application.Products;
 using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
 
@@ -8,20 +8,23 @@ namespace Application.LoanApplications;
 public class LoanApplicationService : ILoanApplicationService
 {
     private readonly ILoanApplicationRepository _loanApplicationRepository;
-    private readonly IProductRepository _productRepository;
     private readonly ICustomerRepository _customerRepository;
+    private readonly IBlacklistedEmailDomainRepository _emailDomainRepository;
+    private readonly IBlacklistedMobileNumberRepository _mobileNumberRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public LoanApplicationService(
         ILoanApplicationRepository loanApplicationRepository,
         IUnitOfWork unitOfWork,
-        IProductRepository productRepository,
-        ICustomerRepository customerRepository)
+        ICustomerRepository customerRepository,
+        IBlacklistedEmailDomainRepository emailDomainRepository,
+        IBlacklistedMobileNumberRepository mobileNumberRepository)
     {
         _loanApplicationRepository = loanApplicationRepository;
         _unitOfWork = unitOfWork;
-        _productRepository = productRepository;
         _customerRepository = customerRepository;
+        _emailDomainRepository = emailDomainRepository;
+        _mobileNumberRepository = mobileNumberRepository;
     }
 
     public async Task Create(CreateLoanApplicationRequest request, CancellationToken cancellationToken)
@@ -30,11 +33,21 @@ public class LoanApplicationService : ILoanApplicationService
 
         if (customer is null)
         {
+            // Return error customer not found
             return;
         }
 
-        // Perform applicant checking
-        if (!IsEligible(customer))
+        // Check if customer has a pending loan application
+        if (await _loanApplicationRepository.CustomerHasPendingLoanApplication(
+            customer.Id,
+            cancellationToken))
+        {
+            // Return error that customer has a pending loan application
+            return;
+        }
+
+        // Perform customer eligibility
+        if (!await IsEligibleAsync(customer))
         {
             // Not eligible error message
             return;
@@ -60,7 +73,7 @@ public class LoanApplicationService : ILoanApplicationService
         return;
     }
 
-    public static bool IsEligible(Customer customer)
+    public async Task<bool> IsEligibleAsync(Customer customer)
     {
         // Check if the customer is at least 18 years old
         if (DateTime.Today.AddYears(-18) < customer.DateOfBirth)
@@ -69,33 +82,18 @@ public class LoanApplicationService : ILoanApplicationService
         }
 
         // Check if the mobile number is blacklisted
-        if (BlacklistedMobileNumbers.Contains(customer.MobileNumber))
+        if (await _mobileNumberRepository.GetByMobileNumberAsync(customer.MobileNumber) != null)
         {
             return false;
         }
 
         // Check if the email domain is blacklisted
         string emailDomain = customer.Email.Split('@')[1];
-        if (BlacklistedDomains.Contains(emailDomain))
+        if (await _emailDomainRepository.GetByEmailDomainAsync(emailDomain) != null)
         {
             return false;
         }
 
         return true;
     }
-
-    public static readonly List<string> BlacklistedMobileNumbers =
-    [
-        // Add blacklisted mobile numbers here
-        "123456789",
-        "987654321"
-    ];
-
-    public static readonly List<string> BlacklistedDomains =
-    [
-        // Add blacklisted domains here
-        "flower.com.au",
-        "example.com",
-        "test.com"
-    ];
 }

@@ -13,4 +13,8 @@
     <None Remove="Entities\LoanApplications\Transaction.cs~RF9e80291.TMP" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="12.2.0" />
+  </ItemGroup>
+
 </Project>

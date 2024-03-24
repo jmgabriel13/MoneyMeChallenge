@@ -17,30 +17,24 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         // Seeding data
         builder.HasData(
-            new Product
-            {
-                Id = Guid.NewGuid(),
-                Name = "Product A",
-                PerAnnumInterestRate = 0,
-                MinimumDuration = 1,
-                MonthsOfFreeInterest = 0
-            },
-            new Product
-            {
-                Id = Guid.NewGuid(),
-                Name = "Product B",
-                PerAnnumInterestRate = 9.20M,
-                MinimumDuration = 6,
-                MonthsOfFreeInterest = 2
-            },
-            new Product
-            {
-                Id = Guid.NewGuid(),
-                Name = "Product C",
-                PerAnnumInterestRate = 10.58M,
-                MinimumDuration = 1,
-                MonthsOfFreeInterest = 0
-            }
+            new Product(
+                Guid.NewGuid(),
+                "Product A",
+                0,
+                1,
+                0),
+            new Product(
+                Guid.NewGuid(),
+                "Product B",
+                9.20M,
+                6,
+                2),
+            new Product(
+                Guid.NewGuid(),
+                "Product C",
+                10.58M,
+                1,
+                0)
         );
     }
 }

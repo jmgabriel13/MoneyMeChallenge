@@ -3,5 +3,5 @@
 namespace Application.Products;
 public interface IProductService
 {
-    Task<IReadOnlyCollection<Product>> GetAllProducts(CancellationToken cancellation = default);
+    Task<IReadOnlyCollection<Product>> GetAllProducts(CancellationToken cancellationToken = default);
 }

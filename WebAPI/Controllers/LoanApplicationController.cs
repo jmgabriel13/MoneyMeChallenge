@@ -1,10 +1,10 @@
 ﻿using Application.LoanApplications;
 using Microsoft.AspNetCore.Mvc;
 
-namespace WebAPI.Controllers;
+namespace WebApp.Controllers;
 
 [Route("api/loan")]
-public class LoanApplicationController : Controller
+public sealed class LoanApplicationController : Controller
 {
     private readonly ILoanApplicationService _loanApplicationService;
 

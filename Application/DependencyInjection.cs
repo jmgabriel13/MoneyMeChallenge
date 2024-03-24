@@ -8,6 +8,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
+        var assembly = typeof(DependencyInjection).Assembly;
+
+        services.AddMediatR(configuration =>
+        {
+            configuration.RegisterServicesFromAssemblies(assembly);
+        });
+
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<ILoanApplicationService, LoanApplicationService>();
         services.AddScoped<IProductService, ProductService>();

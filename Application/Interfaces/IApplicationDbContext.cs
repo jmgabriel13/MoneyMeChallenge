@@ -12,5 +12,6 @@ public interface IApplicationDbContext
     DbSet<Customer> Customers { get; set; }
     DbSet<Product> Products { get; set; }
     DbSet<Loan> Loans { get; set; }
-    DbSet<Blacklist> Blacklists { get; set; }
+    DbSet<BlacklistedEmailDomain> BlacklistedEmailDomains { get; set; }
+    DbSet<BlacklistedMobileNumber> BlacklistedMobileNumbers { get; set; }
 }

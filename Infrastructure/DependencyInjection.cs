@@ -1,4 +1,5 @@
-﻿using Application.Customers;
+﻿using Application.Blacklists;
+using Application.Customers;
 using Application.Interfaces;
 using Application.LoanApplications;
 using Application.Products;
@@ -29,6 +30,8 @@ public static class DependencyInjection
         services.AddScoped<ICustomerRepository, CustomerRepository>();
         services.AddScoped<ILoanApplicationRepository, LoanApplicationRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IBlacklistedEmailDomainRepository, BlacklistedEmailDomainRepository>();
+        services.AddScoped<IBlacklistedMobileNumberRepository, BlacklistedNumberRepository>();
 
         return services;
     }
