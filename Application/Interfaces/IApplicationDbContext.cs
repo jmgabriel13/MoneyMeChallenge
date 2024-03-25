@@ -2,7 +2,7 @@
 using Domain.Entities.Customers;
 using Domain.Entities.LoanApplications;
 using Domain.Entities.Loans;
-using Domain.Entities.Product;
+using Domain.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Interfaces;

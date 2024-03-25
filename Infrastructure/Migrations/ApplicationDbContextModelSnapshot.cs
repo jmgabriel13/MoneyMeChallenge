@@ -39,17 +39,17 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b3d8fe81-4db9-417e-bd49-01a877fbc1d0"),
+                            Id = new Guid("fdc9f665-d109-48bb-b8ec-60135f1713d7"),
                             Value = "test.com"
                         },
                         new
                         {
-                            Id = new Guid("7f0dc9c8-21a0-46c1-ba10-77337298209b"),
+                            Id = new Guid("92714ef4-ccd7-402b-97ef-63d32e17691b"),
                             Value = "hotmail.com"
                         },
                         new
                         {
-                            Id = new Guid("b1b387bf-f98c-4eab-ad3b-5fc571abe6bb"),
+                            Id = new Guid("b0227712-5aba-45ba-a35c-3020a5cb7ee4"),
                             Value = "blackmail.com"
                         });
                 });
@@ -71,17 +71,17 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1173c7e6-02e5-4089-b189-bddde36a59e7"),
+                            Id = new Guid("04d21f2d-86cb-42e9-821f-f2b17df26d18"),
                             Value = "09123456789"
                         },
                         new
                         {
-                            Id = new Guid("df13aaa4-c796-4859-9f24-cbbbebe1bf86"),
+                            Id = new Guid("1041a13a-73f3-4361-a967-e3ac7ce12d62"),
                             Value = "09987654321"
                         },
                         new
                         {
-                            Id = new Guid("8297a80d-ada4-4e9b-acd5-caa6441ad457"),
+                            Id = new Guid("02df9a39-6764-42fa-ad97-032b51b069ac"),
                             Value = "12312312312"
                         });
                 });
@@ -109,7 +109,7 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("MobileNumber")
+                    b.Property<string>("Mobile")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -187,7 +187,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Product.Product", b =>
+            modelBuilder.Entity("Domain.Entities.Products.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -217,7 +217,7 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("cbd45508-0a66-41ef-a424-6e14e1a6fb50"),
+                            Id = new Guid("e4e0f5db-6fbe-4233-946c-cbb67e4df578"),
                             EstablishmentFee = 300,
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
@@ -226,7 +226,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("d1a7ca5f-6f67-4600-9e01-19758c70fc09"),
+                            Id = new Guid("150b4159-8439-49c3-90d1-99ce1a3c3e85"),
                             EstablishmentFee = 300,
                             MinimumDuration = 6,
                             MonthsOfFreeInterest = 2,
@@ -235,7 +235,7 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("cf1b644a-0c76-4c3b-b577-70374d8edc21"),
+                            Id = new Guid("32d02406-fcde-4a94-9fb0-321713a4f6fe"),
                             EstablishmentFee = 300,
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,

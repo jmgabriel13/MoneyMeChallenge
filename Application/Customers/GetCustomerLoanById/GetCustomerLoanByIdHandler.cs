@@ -21,7 +21,7 @@ internal sealed class GetCustomerLoanByIdHandler(
             customer.FirstName,
             customer.LastName,
             customer.DateOfBirth,
-            customer.MobileNumber,
+            customer.Mobile,
             customer.Email,
             customer.Loan.Term,
             customer.Loan.TermInMonths,

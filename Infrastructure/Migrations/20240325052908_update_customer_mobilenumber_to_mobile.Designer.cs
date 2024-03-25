@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240324075458_add_entity_for_blacklisting_mobile_email")]
-    partial class add_entity_for_blacklisting_mobile_email
+    [Migration("20240325052908_update_customer_mobilenumber_to_mobile")]
+    partial class update_customer_mobilenumber_to_mobile
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,17 +42,17 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("aad99a98-ba65-4509-bb5c-6a1209305144"),
+                            Id = new Guid("fdc9f665-d109-48bb-b8ec-60135f1713d7"),
                             Value = "test.com"
                         },
                         new
                         {
-                            Id = new Guid("dea374b9-0c86-44d6-84a7-add33623dfea"),
+                            Id = new Guid("92714ef4-ccd7-402b-97ef-63d32e17691b"),
                             Value = "hotmail.com"
                         },
                         new
                         {
-                            Id = new Guid("3fc3b1f6-be87-4383-9d8c-0f9811002028"),
+                            Id = new Guid("b0227712-5aba-45ba-a35c-3020a5cb7ee4"),
                             Value = "blackmail.com"
                         });
                 });
@@ -74,17 +74,17 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("18868832-8f77-4ca3-81aa-0542a78ec4d4"),
+                            Id = new Guid("04d21f2d-86cb-42e9-821f-f2b17df26d18"),
                             Value = "09123456789"
                         },
                         new
                         {
-                            Id = new Guid("5a5e06a6-feb4-4032-aab8-2ddaccd58231"),
+                            Id = new Guid("1041a13a-73f3-4361-a967-e3ac7ce12d62"),
                             Value = "09987654321"
                         },
                         new
                         {
-                            Id = new Guid("6e2969dc-94a4-4f9a-884d-e931a0e557df"),
+                            Id = new Guid("02df9a39-6764-42fa-ad97-032b51b069ac"),
                             Value = "12312312312"
                         });
                 });
@@ -190,11 +190,14 @@ namespace Infrastructure.Migrations
                     b.ToTable("Loans");
                 });
 
-            modelBuilder.Entity("Domain.Entities.Product.Product", b =>
+            modelBuilder.Entity("Domain.Entities.Products.Product", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("EstablishmentFee")
+                        .HasColumnType("int");
 
                     b.Property<int>("MinimumDuration")
                         .HasColumnType("int");
@@ -217,7 +220,8 @@ namespace Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b913c05b-9fa8-4701-a6ab-e93717566d69"),
+                            Id = new Guid("e4e0f5db-6fbe-4233-946c-cbb67e4df578"),
+                            EstablishmentFee = 300,
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product A",
@@ -225,7 +229,8 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b7f0cc4c-02d4-4a64-b5bf-9b496f15aaf4"),
+                            Id = new Guid("150b4159-8439-49c3-90d1-99ce1a3c3e85"),
+                            EstablishmentFee = 300,
                             MinimumDuration = 6,
                             MonthsOfFreeInterest = 2,
                             Name = "Product B",
@@ -233,7 +238,8 @@ namespace Infrastructure.Migrations
                         },
                         new
                         {
-                            Id = new Guid("71f76f0e-b8b9-4062-9170-af75144d7755"),
+                            Id = new Guid("32d02406-fcde-4a94-9fb0-321713a4f6fe"),
+                            EstablishmentFee = 300,
                             MinimumDuration = 1,
                             MonthsOfFreeInterest = 0,
                             Name = "Product C",

@@ -6,7 +6,7 @@ public sealed record CreateCustomerLoanRateCommand(
     string FirstName,
     string LastName,
     string DateOfBirth,
-    string MobileNumber,
+    string Mobile,
     string Email,
     string Term,
     string AmountRequired,

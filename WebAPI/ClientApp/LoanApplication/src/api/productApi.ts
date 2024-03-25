@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../../config";
 const productApi = {
     getAllProducts: async (): Promise<ProductDto[] | undefined> => {
         try {
-            const response = await axios.get<ProductDto[]>(`${API_BASE_URL}/api/product`)
+            const response = await axios.get<ProductDto[]>(`${API_BASE_URL}/api/products`)
             
             return response.data;
         } catch (error) {

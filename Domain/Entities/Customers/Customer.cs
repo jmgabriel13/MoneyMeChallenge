@@ -10,7 +10,7 @@ public class Customer
     public string FirstName { get; private set; }
     public string LastName { get; private set; }
     public DateTime DateOfBirth { get; private set; }
-    public string MobileNumber { get; private set; }
+    public string Mobile { get; private set; }
     public string Email { get; private set; }
     public string RedirectURL { get; private set; }
     public Loan Loan { get; private set; }
@@ -31,7 +31,7 @@ public class Customer
         FirstName = firstName;
         LastName = lastName;
         DateOfBirth = dateOfBirth;
-        MobileNumber = mobileNumber;
+        Mobile = mobileNumber;
         Email = email;
         RedirectURL = redirectURL;
         Loan = loan;

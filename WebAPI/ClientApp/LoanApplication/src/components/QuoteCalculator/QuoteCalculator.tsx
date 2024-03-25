@@ -47,12 +47,18 @@ const terms = [
     },
 ];
 
-function InitializeCustomerLoanDto(): Partial<CustomerLoanDto> {
+function InitializeCustomerLoanDto(): CustomerLoanDto {
     return {
+        title: 'Mr.',
         firstName: '',
         lastName: '',
+        dateOfBirth: new Date(),
         mobileNumber: '',
-        email: ''
+        email: '',
+        term: 0,
+        termInMonths: 6,
+        amountRequired: 5000,
+        product: ''
     }
 }
 
@@ -73,7 +79,8 @@ export default function QuoteCalculator() {
         name: '',
         perAnnumInterestRate: 0,
         minimumDuration: 0,
-        monthsOfFreeInterest: 0
+        monthsOfFreeInterest: 0,
+        establishmentFee: 0
     })
 
     // Get values from api
@@ -82,7 +89,7 @@ export default function QuoteCalculator() {
                 id ? await customerApi.getCustomerLoanById(id!).then((customerLoanData) => {return customerLoanData!}) : InitializeCustomerLoanDto()
     })
 
-    const onSubmit: SubmitHandler<Partial<CustomerLoanDto>> = (data) => {
+    const onSubmit: SubmitHandler<CustomerLoanDto> = (data) => {
         console.log(data)
 
         if (id) {
@@ -97,7 +104,7 @@ export default function QuoteCalculator() {
                 mobileNumber: data.mobileNumber!,
                 email: data.email!,
                 term: monthsToYears(data.termInMonths!).toString(),
-                amountRequired: data.amountRequired!.toString()
+                amountRequired: data.amountRequired.toString()
             }
     
             console.log(request)

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Product;
+﻿using Domain.Entities.Products;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

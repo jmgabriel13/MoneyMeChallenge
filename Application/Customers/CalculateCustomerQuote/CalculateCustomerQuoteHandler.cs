@@ -41,7 +41,7 @@ internal sealed class CalculateCustomerQuoteHandler(
         var quote = new CustomerQuoteResponse(
             customer.FirstName,
             customer.LastName,
-            customer.MobileNumber,
+            customer.Mobile,
             customer.Email,
             customer.Loan.AmountRequired,
             customer.Loan.TermInMonths,

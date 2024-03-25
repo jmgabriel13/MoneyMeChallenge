@@ -67,7 +67,7 @@ internal sealed class CreateLoanApplicationHandler(
         }
 
         // Check if the mobile number is blacklisted
-        if (await _mobileNumberRepository.GetByMobileNumberAsync(customer.MobileNumber) != null)
+        if (await _mobileNumberRepository.GetByMobileNumberAsync(customer.Mobile) != null)
         {
             return false;
         }

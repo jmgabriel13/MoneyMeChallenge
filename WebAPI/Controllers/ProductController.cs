@@ -2,6 +2,7 @@
 using Application.Products.Create;
 using Application.Products.Delete;
 using Application.Products.Update;
+using Domain.Entities.Products;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Abstraction;
@@ -28,14 +29,14 @@ public sealed class ProductController(IProductService _productService) : ApiCont
     [HttpGet]
     public async Task<IActionResult> GetAllProducts(CancellationToken cancellationToken)
     {
-        Result result = await _productService.GetAllProducts(cancellationToken);
+        Result<IReadOnlyCollection<Product>> result = await _productService.GetAllProducts(cancellationToken);
 
         if (result.IsFailure)
         {
             return HandleFailure(result);
         }
 
-        return Ok(result);
+        return Ok(result.Value);
     }
 
     [HttpPut]

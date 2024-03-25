@@ -1,5 +1,5 @@
 ﻿using Application.Products;
-using Domain.Entities.Product;
+using Domain.Entities.Products;
 using Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 

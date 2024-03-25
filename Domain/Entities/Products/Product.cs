@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Product;
+﻿namespace Domain.Entities.Products;
 public class Product
 {
     private const int _establishmentFee = 300;

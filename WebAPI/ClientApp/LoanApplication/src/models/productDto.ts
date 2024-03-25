@@ -3,5 +3,6 @@ export interface ProductDto {
     name: string,
     perAnnumInterestRate: number,
     minimumDuration: number,
-    monthsOfFreeInterest: number
+    monthsOfFreeInterest: number,
+    establishmentFee: number
 }
