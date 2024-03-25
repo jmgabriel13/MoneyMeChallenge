@@ -15,7 +15,8 @@ public sealed class LoanApplicationRepository(
     {
         return await _context.LoanApplicatons
             .AnyAsync(l =>
-            l.CustomerId == customerId,
+            l.CustomerId == customerId &&
+            l.Status == LoanStatus.Pending,
             cancellationToken);
     }
 }

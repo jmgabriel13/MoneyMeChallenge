@@ -1,4 +1,4 @@
-import { useSearchParams } from "react-router-dom"
+import { useNavigate, useSearchParams } from "react-router-dom"
 import customerApi from "../../api/customerApi";
 import { CustomerLoanDto } from "../../models/customerLoanDto";
 import { Box, Button, Grid, TextField, Typography, Container, MenuItem, Stack, Slider, Paper, FormControl, FormHelperText, Autocomplete } from "@mui/material";
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { useEffect, useState } from "react";
 import productApi from "../../api/productApi";
 import { ProductDto } from "../../models/productDto";
+import { monthsToYears } from "../../utility/monthsToYears";
 
 const title = [
     {
@@ -53,7 +54,7 @@ function InitializeCustomerLoanDto(): CustomerLoanDto {
         firstName: '',
         lastName: '',
         dateOfBirth: new Date(),
-        mobileNumber: '',
+        mobile: '',
         email: '',
         term: 0,
         termInMonths: 6,
@@ -62,15 +63,8 @@ function InitializeCustomerLoanDto(): CustomerLoanDto {
     }
 }
 
-function monthsToYears(months: number): number {
-    if (months < 0) {
-        return 1 / 12;
-    }
-
-    return months / 12;
-}
-
 export default function QuoteCalculator() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const id = searchParams.get('customerId')
     const [products, setProducts] = useState<ProductDto[]>([])
@@ -90,26 +84,26 @@ export default function QuoteCalculator() {
     })
 
     const onSubmit: SubmitHandler<CustomerLoanDto> = (data) => {
-        console.log(data)
-
         if (id) {
-            // Should call the api that calcualte quote using PMT Function
-
+            navigate(`/quote?customerId=${id}&productId=${data.product}&term=${data.termInMonths}&amountRequired=${data.amountRequired}`)
         } else {
             const request = {
                 title: data.title!,
                 firstName: data.firstName!,
                 lastName: data.lastName!,
                 dateOfBirth: new Date(data.dateOfBirth!)!,
-                mobileNumber: data.mobileNumber!,
+                mobile: data.mobile!,
                 email: data.email!,
                 term: monthsToYears(data.termInMonths!).toString(),
                 amountRequired: data.amountRequired.toString()
             }
-    
-            console.log(request)
-    
-            customerApi.getCustomerRate(request).then((response) => console.log(response));
+
+            // If no id appended in parameter, just register the customer 
+            // then append the response to URL then navigate.
+            customerApi.getCustomerLoanRate(request).then((response) => {
+                // to be updated
+                navigate(response.value.replace("https://localhost:7089/", ""))
+            });
         }
     }
 
@@ -129,10 +123,11 @@ export default function QuoteCalculator() {
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
+                    width: "100%"
                 }}
                 >
-                <Paper elevation={3} sx={{ padding: "60px" }} >
-                    <Typography component="h1" variant="h3" fontWeight="bold">
+                <Paper elevation={3} sx={{ width: "90%", padding: "60px" }} >
+                    <Typography variant="h4" fontWeight="bold">
                         Quote calculator
                     </Typography>
                     <Box component="form" noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 3, flexGrow: 1 }}>
@@ -155,7 +150,6 @@ export default function QuoteCalculator() {
                                                         return product.name
                                                     }}
                                                     onChange={(event: unknown, newValue) => {
-                                                        console.log(newValue)
                                                         setProduct(newValue)
                                                         onChange(newValue ? newValue.id : null)
                                                     }}
@@ -343,7 +337,7 @@ export default function QuoteCalculator() {
                                 <Grid container spacing={2} justifyContent="space-between">
                                     <Grid item xs={12} sm={7}>
                                         <Controller
-                                            name="mobileNumber"
+                                            name="mobile"
                                             rules={{
                                                 required: "Mobile Number is required"
                                             }}
@@ -353,9 +347,9 @@ export default function QuoteCalculator() {
                                                     <TextField
                                                         required
                                                         fullWidth
-                                                        id="mobileNumber"
+                                                        id="mobile"
                                                         label="Mobile number"
-                                                        name="mobileNumber"
+                                                        name="mobile"
                                                         onChange={onChange}
                                                         onBlur={onBlur}
                                                         value={value ?? ""}

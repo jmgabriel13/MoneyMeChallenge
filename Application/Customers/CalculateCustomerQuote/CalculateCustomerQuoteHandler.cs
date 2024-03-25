@@ -8,9 +8,10 @@ using Microsoft.VisualBasic;
 namespace Application.Customers.CalculateCustomerQuote;
 internal sealed class CalculateCustomerQuoteHandler(
     ICustomerRepository _customerRepository,
-    IProductRepository _productRepository) : ICommandHandler<CalculateCustomerQuoteRequest, CustomerQuoteResponse>
+    IProductRepository _productRepository,
+    IUnitOfWork _unitOfWork) : ICommandHandler<CalculateCustomerQuoteRequest, CalculateCustomerQuoteResponse>
 {
-    public async Task<Result<CustomerQuoteResponse>> Handle(CalculateCustomerQuoteRequest request, CancellationToken cancellationToken)
+    public async Task<Result<CalculateCustomerQuoteResponse>> Handle(CalculateCustomerQuoteRequest request, CancellationToken cancellationToken)
     {
         var customer = await _customerRepository.FindByIdAsync(request.CustomerId, cancellationToken);
         var product = await _productRepository.GetByIdAsync(request.ProductId, cancellationToken);
@@ -18,16 +19,30 @@ internal sealed class CalculateCustomerQuoteHandler(
         if (customer is null || product is null)
         {
             // Return error, cant proceed if customer or product are not found
-            return Result.Failure<CustomerQuoteResponse>(DomainErrors.Customer.CustomerOrProductNotFound);
+            return Result.Failure<CalculateCustomerQuoteResponse>(DomainErrors.Customer.CustomerOrProductNotFound);
+        }
+
+        // Checking if theres a changes in amount and term,
+        // update if theres a changes
+        if (customer.Loan.AmountRequired != request.AmountRequired || customer.Loan.TermInMonths != request.TermInMonths)
+        {
+            // Update Customer loan
+            customer.Loan.Update(request.TermInMonths, request.AmountRequired);
+            _customerRepository.Update(customer);
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
 
         // calculate the monthly repayment amount using PMT function
-        // first convert PerAnnumInterestRate to a decimal value then divide it by 12months(1yr)
+        // first convert PerAnnumInterestRate to a decimal value
+        // then divide it by 12months(1yr) to convert it as percentage.
         double monthlyInterestRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
+        // calculate using PMT Function
         double monthlyPayment = -Financial.Pmt(
             monthlyInterestRate,
             customer.Loan.TermInMonths,
             customer.Loan.AmountRequired);
+        // calculate total repayments based on term in months
         decimal totalRepayments = (decimal)monthlyPayment * customer.Loan.TermInMonths;
 
         // Check if theres a month(s) of free interest in product.
@@ -38,20 +53,27 @@ internal sealed class CalculateCustomerQuoteHandler(
             totalRepayments -= (decimal)monthlyPayment * product.MonthsOfFreeInterest;
         }
 
-        var quote = new CustomerQuoteResponse(
+        decimal monthlyPaymentFinal = (decimal)monthlyPayment;
+        decimal totalRepaymentsFinal = totalRepayments + product.EstablishmentFee;
+        decimal totalInterestFinal = totalRepayments - customer.Loan.AmountRequired;
+
+        // Monthly Iterest Rate back to decimal
+        decimal monthlyInterestRateDecimalFinal = Math.Round((decimal)monthlyInterestRate * 100, 2);
+
+        var quote = new CalculateCustomerQuoteResponse(
             customer.FirstName,
             customer.LastName,
             customer.Mobile,
             customer.Email,
             customer.Loan.AmountRequired,
             customer.Loan.TermInMonths,
-            (decimal)monthlyPayment,
+            monthlyPaymentFinal,
             nameof(RepaymentFrequency.Monthly),
             product.PerAnnumInterestRate,
-            (decimal)monthlyInterestRate,
-            totalRepayments + product.EstablishmentFee,
+            monthlyInterestRateDecimalFinal,
+            totalRepaymentsFinal,
             product.EstablishmentFee,
-            totalRepayments - customer.Loan.AmountRequired);
+            totalInterestFinal);
 
         return Result.Success(quote);
     }

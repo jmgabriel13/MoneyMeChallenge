@@ -1,33 +1,55 @@
 export interface CustomerLoanDto {
+    amountRequired: number,
+    term: number,
     title: string,
     firstName: string,
     lastName: string,
     dateOfBirth: Date,
-    mobileNumber: string,
+    mobile: string,
     email: string,
-    term: number,
     termInMonths: number,
-    amountRequired: number,
     product: string
 }
 
-export interface CustomerLoanResponse {
-    value: CustomerLoanDto,
-    isSuccess: boolean,
-    isFailure: boolean,
-    error: {
-        code: string,
-        message: string
-    }
-}
-
 export interface CustomerLoanRate {
+    amountRequired: string
+    term: string,
     title: string,
     firstName: string,
     lastName: string,
     dateOfBirth: Date,
-    mobileNumber: string,
+    mobile: string,
     email: string,
-    term: string,
-    amountRequired: string
+}
+
+export interface CalculateCustomerQuoteRequest {
+    customerId: string,
+    productId: string,
+    termInMonths: number,
+    amountRequired: number
+}
+
+export interface CalculateCustomerQuoteResponse {
+    firstName: string,
+    lastName: string,
+    mobile: string,
+    email: string,
+    principalAmount: number,
+    termInMonths: number,
+    repayment: number,
+    repaymentFrequency: string,
+    perAnnumInterestRate: number,
+    monthlyInterestRate: number,
+    totalRepayments: number,
+    establishmentFee: number,
+    totalInterest: number
+}
+
+export interface CustomerLoanApplicationRequest {
+    customerId: string,
+    repaymentFrequency: string,
+    repayment: number,
+    totalRepayments: number,
+    interestRate: number,
+    interest: number
 }

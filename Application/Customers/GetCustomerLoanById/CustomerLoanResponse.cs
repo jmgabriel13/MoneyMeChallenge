@@ -4,7 +4,7 @@ public sealed record CustomerLoanResponse(
     string FirstName,
     string LastName,
     DateTime DateOfBirth,
-    string MobileNumber,
+    string Mobile,
     string Email,
     decimal Term,
     int TermInMonths,

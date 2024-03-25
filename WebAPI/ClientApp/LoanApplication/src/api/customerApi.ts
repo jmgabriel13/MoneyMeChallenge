@@ -1,28 +1,32 @@
-import axios from "axios";
-import { CustomerLoanDto, CustomerLoanRate, CustomerLoanResponse } from "../models/customerLoanDto";
+import { CalculateCustomerQuoteRequest, CalculateCustomerQuoteResponse, CustomerLoanApplicationRequest, CustomerLoanDto, CustomerLoanRate } from "../models/customerLoanDto";
+import { ResultResponse } from "../models/resultResponse";
 import { API_BASE_URL } from './../../config';
+import axiosInstance from "./axiosInstance";
 
 const customerApi = {
-    getCustomerLoanById: async (customerId: string): Promise<CustomerLoanDto> => {
-        try {
-            const response = await axios.get<CustomerLoanResponse>(`${API_BASE_URL}/api/customers/loan/${customerId}`)
-            console.log(response)
-            return response.data.value;
-        } catch (error) {
-            console.log(error);
-            throw error;
-        }
+    getCustomerLoanRate: async (customerLoan: CustomerLoanRate): Promise<ResultResponse<string>> => {
+        const response = await axiosInstance.post<ResultResponse<string>>(`${API_BASE_URL}/api/customers/loan/rate`, customerLoan);
+            
+        return response.data;
     },
 
-    getCustomerRate: async (customerLoan: CustomerLoanRate): Promise<string> => {
-        try {
-            const response = await axios.post<string>(`${API_BASE_URL}/api/customers/rate`, customerLoan);
-            console.log(response)
-            return response.data;
-        } catch (error) {
-            console.log(error)
-            throw error;
-        }
+    getCustomerLoanById: async (customerId: string): Promise<CustomerLoanDto> => {
+        const response = await axiosInstance.get<ResultResponse<CustomerLoanDto>>(`${API_BASE_URL}/api/customers/loan/${customerId}`)
+            
+        return response.data.value;
+    },
+
+    calculateQuote: async (calculateCustomerQuoteRequest: CalculateCustomerQuoteRequest): Promise<ResultResponse<CalculateCustomerQuoteResponse>> => {
+        const response = await axiosInstance.get<ResultResponse<CalculateCustomerQuoteResponse>>(`${API_BASE_URL}/api/customers/calculate/quote`, { params: calculateCustomerQuoteRequest });
+        console.log("calculateQuote")
+        console.log(response)
+        return response.data;
+    },
+
+    customerLoanApplication: async (customerLoanApplicationRequest: CustomerLoanApplicationRequest): Promise<string> => {
+        const response = await axiosInstance.post(`/api/customers/loan/application`, customerLoanApplicationRequest);
+        console.log(response)
+        return response.data;
     },
 
 }

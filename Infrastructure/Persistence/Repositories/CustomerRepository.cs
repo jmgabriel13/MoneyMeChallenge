@@ -27,4 +27,9 @@ public sealed class CustomerRepository(
             c.DateOfBirth == dateOfBirth,
             cancellationToken: cancellationToken);
     }
+
+    public void Update(Customer customer)
+    {
+        _context.Update(customer);
+    }
 }

@@ -1,8 +1,8 @@
-﻿namespace Application.Customers;
-public sealed record CustomerQuoteResponse(
+﻿namespace Application.Customers.CalculateCustomerQuote;
+public sealed record CalculateCustomerQuoteResponse(
     string FirstName,
     string LastName,
-    string MobileNumber,
+    string Mobile,
     string Email,
     int PrincipalAmount,
     int TermInMonths,

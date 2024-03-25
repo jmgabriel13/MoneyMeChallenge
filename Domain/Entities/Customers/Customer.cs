@@ -58,7 +58,6 @@ public class Customer
         var loan = Loan.Create(
             Guid.NewGuid(),
             decimal.Parse(term),
-            YearsToMonths(decimal.Parse(term)),
             Int32.Parse(amountRequired));
 
         // Generate redirect link for current customer
@@ -76,15 +75,5 @@ public class Customer
                 loan);
 
         return customer;
-    }
-
-    private static int YearsToMonths(decimal years)
-    {
-        if (years < 0)
-        {
-            throw new ArgumentException("Invalid input: Please provide a non-negative number of years.", nameof(years));
-        }
-
-        return (int)Math.Round(years * 12);
     }
 }
