@@ -4,10 +4,10 @@ import { Box, Button, Container, Divider, FormControl, FormHelperText, Grid, Pap
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { CalculateCustomerQuoteResponse } from "../../models/customerLoanDto";
-import { Error } from "../../models/resultResponse";
 import Information from "../Information/Information";
 import { amounts } from "./amounts";
 import { terms } from "./terms";
+import { Error } from "../../models/resultResponse";
 
 interface CustomerInfo {
     name: string,
@@ -86,7 +86,8 @@ export default function Quote() {
         title: "",
         status: 0,
         detail: "",
-        errors: {}
+        errors: {},
+        isSuccess: false
     })
 
     // not best approach, to be refactor
@@ -196,6 +197,7 @@ export default function Quote() {
                     newQueryParameters.set("term", (data.termInMonths!).toString() ?? quoteState.principalAmount)
                     newQueryParameters.set("amountRequired", (data.principalAmount!).toString() ?? quoteState.principalAmount)
                     setSearchParams(newQueryParameters)
+                    console.log(currentQueryParameters.get(""))
                     window.location.reload()
                 })
             })

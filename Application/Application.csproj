@@ -20,4 +20,11 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
+	<!-- specifying assembly attribute for unit test project -->
+	<ItemGroup>
+		<AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+			<_Parameter1>UnitTest</_Parameter1>
+		</AssemblyAttribute>
+	</ItemGroup>
+
 </Project>

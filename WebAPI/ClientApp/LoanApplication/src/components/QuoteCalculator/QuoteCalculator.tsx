@@ -128,6 +128,7 @@ export default function QuoteCalculator() {
                                                         return product.name
                                                     }}
                                                     onChange={(event: unknown, newValue) => {
+                                                        console.log(event)
                                                         setProduct(newValue)
                                                         onChange(newValue ? newValue.id : null)
                                                     }}

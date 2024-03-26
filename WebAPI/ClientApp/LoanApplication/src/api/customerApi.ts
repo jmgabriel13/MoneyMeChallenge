@@ -1,5 +1,5 @@
 import { CalculateCustomerQuoteRequest, CalculateCustomerQuoteResponse, CustomerInfoRequest, CustomerLoanApplicationRequest, CustomerLoanDto, CustomerLoanRate, FinanceDetailsRequest } from "../models/customerLoanDto";
-import { ResultResponse } from "../models/resultResponse";
+import { Error, ResultResponse } from "../models/resultResponse";
 import { API_BASE_URL } from './../../config';
 import axiosInstance from "./axiosInstance";
 
@@ -22,7 +22,7 @@ const customerApi = {
         return response.data;
     },
 
-    customerLoanApplication: async (customerLoanApplicationRequest: CustomerLoanApplicationRequest): Promise<void> => {
+    customerLoanApplication: async (customerLoanApplicationRequest: CustomerLoanApplicationRequest): Promise<Error> => {
         const response = await axiosInstance.post(`/api/customers/loan/application`, customerLoanApplicationRequest);
         console.log(response)
         return response.data;
