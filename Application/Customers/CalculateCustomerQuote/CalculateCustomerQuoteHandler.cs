@@ -35,27 +35,43 @@ internal sealed class CalculateCustomerQuoteHandler(
 
         // calculate the monthly repayment amount using PMT function
         // first convert PerAnnumInterestRate to a decimal value
-        // then divide it by 12months(1yr) to convert it as percentage.
+        // then divide it by 12months(1yr) to convert it to percentage.
         double monthlyInterestRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
-        // calculate using PMT Function
-        double monthlyPayment = -Financial.Pmt(
+
+        // consider other fees, add to amountRequired from request
+        int principalAmount = customer.Loan.AmountRequired + product.EstablishmentFee;
+
+        // calculate using PMT Function to get monthly payment WITH interest based on monthly interest rate
+        double monthlyPaymentWithInterestFinal = -Financial.Pmt(
             monthlyInterestRate,
             customer.Loan.TermInMonths,
-            customer.Loan.AmountRequired);
-        // calculate total repayments based on term in months
-        decimal totalRepayments = (decimal)monthlyPayment * customer.Loan.TermInMonths;
+            principalAmount);
+
+        // calculate total repayments with interest based on term in months
+        decimal totalRepaymentsWithInterestFinal = (decimal)monthlyPaymentWithInterestFinal * customer.Loan.TermInMonths;
+        // Calculate first the totalInterest by subtracting principal amount(AmountRequired) to total repayments with interest
+        decimal totalInterestFinal = totalRepaymentsWithInterestFinal - principalAmount;
 
         // Check if theres a month(s) of free interest in product.
+        double monthlyPaymentWithoutInterestFinal = 0;
         if (product.MonthsOfFreeInterest > 0)
         {
-            // Then minus the monthlyPayment multiply by MonthsOfFreeInterest to totalRepaymens
-            // To get only the sum of monthlyPayment that has a interest.
-            totalRepayments -= (decimal)monthlyPayment * product.MonthsOfFreeInterest;
-        }
+            // calculate using PMT Function to get monthly payment WITHOUT interest
+            monthlyPaymentWithoutInterestFinal = -Financial.Pmt(
+                0,
+                customer.Loan.TermInMonths,
+                principalAmount);
 
-        decimal monthlyPaymentFinal = (decimal)monthlyPayment;
-        decimal totalRepaymentsFinal = totalRepayments + product.EstablishmentFee;
-        decimal totalInterestFinal = totalRepayments - customer.Loan.AmountRequired;
+            // get the monthly interest by dividing total interest from loan term in months
+            decimal monthlyInterest = totalInterestFinal / customer.Loan.TermInMonths;
+            // multiply the monthlyInterest to the product months of free interest
+            decimal totalMonthsOfFreeInterest = monthlyInterest * product.MonthsOfFreeInterest;
+
+            // deduct the totalMonthsOfFreeInterest to the final values
+            totalInterestFinal -= totalMonthsOfFreeInterest;
+            // recompute total repayments
+            totalRepaymentsWithInterestFinal = (decimal)monthlyPaymentWithoutInterestFinal * customer.Loan.TermInMonths + totalInterestFinal;
+        }
 
         // Monthly Iterest Rate back to decimal
         decimal monthlyInterestRateDecimalFinal = Math.Round((decimal)monthlyInterestRate * 100, 2);
@@ -67,13 +83,15 @@ internal sealed class CalculateCustomerQuoteHandler(
             customer.Email,
             customer.Loan.AmountRequired,
             customer.Loan.TermInMonths,
-            monthlyPaymentFinal,
+            (decimal)monthlyPaymentWithInterestFinal,
+            (decimal)monthlyPaymentWithoutInterestFinal,
             nameof(RepaymentFrequency.Monthly),
             product.PerAnnumInterestRate,
             monthlyInterestRateDecimalFinal,
-            totalRepaymentsFinal,
+            totalRepaymentsWithInterestFinal,
             product.EstablishmentFee,
-            totalInterestFinal);
+            totalInterestFinal,
+            product.MonthsOfFreeInterest);
 
         return Result.Success(quote);
     }

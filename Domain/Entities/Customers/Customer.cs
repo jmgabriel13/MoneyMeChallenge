@@ -76,4 +76,12 @@ public class Customer
 
         return customer;
     }
+
+    public void Update(string firstName, string lastName, string mobile, string email)
+    {
+        FirstName = firstName;
+        LastName = lastName;
+        Mobile = mobile;
+        Email = email;
+    }
 }

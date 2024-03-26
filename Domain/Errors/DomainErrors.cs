@@ -14,7 +14,7 @@ public static class DomainErrors
 
         public static readonly Error InvalidDateOfBirth = new("Customer.DateOfBirth", "Date of Birth is not valid.");
         public static readonly Error CustomerOrProductNotFound = new("Customer.Calculate.Quote", "Customer or product not found.");
-        public static readonly Error HasPendingLoanApplication = new("Customer.Loan.Application", "Customer Has pending loan application.");
+        public static readonly Error HasPendingLoanApplication = new("Customer.Loan.Application", "Sorry, you already have an active loan application with us. Need help? Contact support. Thanks!");
         public static readonly Error NotEligible = new("Customer.Loan.Application", "Customer is not eligible to apply for a loan.");
     }
 }

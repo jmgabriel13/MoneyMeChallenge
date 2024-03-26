@@ -7,9 +7,11 @@ public sealed record CalculateCustomerQuoteResponse(
     int PrincipalAmount,
     int TermInMonths,
     decimal Repayment,
+    decimal RepaymentWithoutInterest,
     string RepaymentFrequency,
     decimal PerAnnumInterestRate,
     decimal MonthlyInterestRate,
     decimal TotalRepayments,
     int EstablishmentFee,
-    decimal TotalInterest);
+    decimal TotalInterest,
+    int MonthsOfFreeInterest);

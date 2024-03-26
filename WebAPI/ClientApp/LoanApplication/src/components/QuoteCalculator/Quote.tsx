@@ -1,28 +1,33 @@
 import customerApi from "../../api/customerApi";
-import { useSearchParams } from "react-router-dom";
-import { Box, Button, Container, Divider, FormControl, FormHelperText, Grid, Paper, Stack, TextField, Typography, colors } from "@mui/material";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { Box, Button, Container, Divider, FormControl, FormHelperText, Grid, Paper, Slider, Stack, TextField, Typography, colors } from "@mui/material";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { useEffect, useState } from "react";
 import { CalculateCustomerQuoteResponse } from "../../models/customerLoanDto";
 import { Error } from "../../models/resultResponse";
-import { Label, LabelImportant } from "@mui/icons-material";
 import Information from "../Information/Information";
+import { amounts } from "./amounts";
+import { terms } from "./terms";
 
 interface CustomerInfo {
     name: string,
+    firstName: string,
+    lastName: string,
     mobile: string,
     email: string,
 }
 
 interface FinanceDetails {
     principalAmount: number,
+    termInMonths: number,
     repayment: number,
-    repaymentFrequency: string,
 }
 
 function InitializeCustomerInfo(data?: CustomerInfo): CustomerInfo {
     return {
         name: data?.name ?? '',
+        firstName: data?.firstName ?? '',
+        lastName: data?.lastName ?? '',
         mobile: data?.mobile ??  '',
         email: data?.email ?? ''
     }
@@ -31,8 +36,8 @@ function InitializeCustomerInfo(data?: CustomerInfo): CustomerInfo {
 function InitializeFinanceDetails(data?: FinanceDetails): FinanceDetails {
     return {
         principalAmount: data?.principalAmount ?? 0,
-        repayment: data?.repayment ?? 0,
-        repaymentFrequency: data?.repaymentFrequency ?? ''
+        termInMonths: data?.termInMonths ?? 0,
+        repayment: data?.repayment ?? 0
     }
 }
 
@@ -49,14 +54,33 @@ const roundTo = function(num: number, places: number) {
 };
 
 export default function Quote() {
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+    const newQueryParameters : URLSearchParams = new URLSearchParams();
+    const [currentQueryParameters, setSearchParams] = useSearchParams();
     const customerId = searchParams.get('customerId')
     const productId = searchParams.get('productId')
     const term = searchParams.get('term')
     const amountRequired = searchParams.get('amountRequired')
     const [infoEdit, setInfoEdit] = useState(false)
     const [financeDetailsEdit, setFinanceDetailsEdit] = useState(false)
-    const [quoteState, setQuoteState] = useState<CalculateCustomerQuoteResponse>({})
+    const [quoteState, setQuoteState] = useState<CalculateCustomerQuoteResponse>({
+        firstName: "",
+        lastName: "",
+        mobile: "",
+        email: "",
+        principalAmount: 0,
+        termInMonths: 0,
+        repayment: 0,
+        repaymentWithoutInterest: 0,
+        repaymentFrequency: "",
+        perAnnumInterestRate: 0,
+        monthlyInterestRate: 0,
+        totalRepayments: 0,
+        establishmentFee: 0,
+        totalInterest: 0,
+        monthsOfFreeInterest: 0
+    })
     const [error, setError] = useState<Error>({
         type: "",
         title: "",
@@ -64,6 +88,21 @@ export default function Quote() {
         detail: "",
         errors: {}
     })
+
+    // not best approach, to be refactor
+    async function calculateQuote(customerId: string, productId: string, term: string, amountRequired: string) {
+        if (customerId && productId && term && amountRequired) {
+            const response = await customerApi.calculateQuote({ 
+                customerId: customerId,
+                productId: productId, 
+                termInMonths: parseFloat(term),
+                amountRequired: parseInt(amountRequired)
+             }).then((response) => {
+                return response
+            });
+            setQuoteState(response.value)
+        }
+    }
 
     // Customer Information form
     const { control: customerInforControl,
@@ -82,6 +121,8 @@ export default function Quote() {
 
                 return InitializeCustomerInfo({
                     name: `${response.value.firstName} ${response.value.lastName}`,
+                    firstName: response.value.firstName,
+                    lastName: response.value.lastName,
                     mobile: response.value.mobile,
                     email: response.value.email
                 })
@@ -96,8 +137,7 @@ export default function Quote() {
         control: financialDetailsControl,
         handleSubmit: handleSubmitFinancialDetails 
     } = useForm({
-        defaultValues: 
-        async () => {
+        defaultValues: async () => {
             if (customerId && productId && term && amountRequired) {
                 const response = await customerApi.calculateQuote({ 
                     customerId: customerId,
@@ -110,8 +150,8 @@ export default function Quote() {
 
                 return InitializeFinanceDetails({
                     principalAmount: response.value.principalAmount,
-                    repayment: response.value.repayment,
-                    repaymentFrequency: response.value.repaymentFrequency
+                    termInMonths: response.value.termInMonths,
+                    repayment: response.value.repayment
                 })
             } else {
                 InitializeFinanceDetails()
@@ -122,15 +162,47 @@ export default function Quote() {
     const onSubmitCustomerInfo: SubmitHandler<Partial<CustomerInfo>> = (data) => {
 
         console.log(data)
+
+        if (customerId && productId && term && amountRequired) {
+            // Save updated data 
+            customerApi.updateCustomerInfo(customerId, {
+                firstName: data.firstName!,
+                lastName: data.lastName!,
+                mobile: data.mobile!,
+                email: data.email!,
+            }).then(() => {
+                // Then call updates from api
+                calculateQuote(customerId, productId, term, amountRequired)
+                window.location.reload()
+            })
+        }
     }
 
     const onSubmitFinancialDetails: SubmitHandler<Partial<FinanceDetails>> = (data) => {
 
         console.log(data)
+
+        if (customerId && productId && term && amountRequired) {
+            
+            // Save updated data 
+            customerApi.updateFinanceDetails(customerId, {
+                amountRequired: data.principalAmount!,
+                termInMonths: data.termInMonths!
+            }).then(() => {
+                calculateQuote(customerId, productId, term, amountRequired).then(() => {
+                    console.log("financedetails")
+                    newQueryParameters.set("customerId", customerId)
+                    newQueryParameters.set("productId", productId)
+                    newQueryParameters.set("term", (data.termInMonths!).toString() ?? quoteState.principalAmount)
+                    newQueryParameters.set("amountRequired", (data.principalAmount!).toString() ?? quoteState.principalAmount)
+                    setSearchParams(newQueryParameters)
+                    window.location.reload()
+                })
+            })
+        }
     }
 
     const handleLoanApplication = async() => {
-        console.log("Test")
         await customerApi.customerLoanApplication({
             customerId: customerId!,
             repaymentFrequency: quoteState.repaymentFrequency,
@@ -140,28 +212,22 @@ export default function Quote() {
             interest: quoteState.totalInterest
         }).then((res) => {
             console.log(res)
-            if (res.status != 200) {
+            if (res.status == 200 || res.isSuccess) {
+                navigate("/success")
+            } else {
                 setError(res)
             }
         })
     }
 
+    function valueText(value: number) {
+        return `${value}`;
+    }
+
     useEffect(() => {
-        // not best approach, to be refactor
-        async function fetch() {
-            if (customerId && productId && term && amountRequired) {
-                const response = await customerApi.calculateQuote({ 
-                    customerId: customerId,
-                    productId: productId, 
-                    termInMonths: parseFloat(term),
-                    amountRequired: parseInt(amountRequired)
-                 }).then((response) => {
-                    return response
-                });
-                setQuoteState(response.value)
-            }
+        if (customerId && productId && term && amountRequired) {
+            calculateQuote(customerId, productId, term, amountRequired)
         }
-        fetch()
     }, [customerId, productId, term, amountRequired])
 
     return (
@@ -195,6 +261,7 @@ export default function Quote() {
                                 </Grid>
                                 <Grid item xs={7} sm={6} md={6} display="flex" justifyContent="flex-end">
                                     <Button 
+                                        type={infoEdit ? "button" : "submit"}
                                         onClick={() => infoEdit ? 
                                                 setInfoEdit(false) 
                                                 : 
@@ -203,7 +270,7 @@ export default function Quote() {
                                         size="medium"
                                         sx={{ color: "#08d1cf", fontWeight: "bold" }}
                                     >
-                                        Edit
+                                        {infoEdit ? "Save" : "Edit"}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -219,26 +286,65 @@ export default function Quote() {
 										Name
 									</Typography>
                                 </Grid>
-                                <Grid item xs={7} sm={6} md={6}>
-                                    <Controller
-                                        name="name"
-                                        rules={{
-                                            required: "Name is required"
-                                        }}
-                                        control={customerInforControl}
-                                        render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
-                                            <FormControl fullWidth error={!!error}>
-                                                {infoEdit ?
-                                                    <TextField
-                                                        id="name"
-                                                        label="Name"
-                                                        onChange={onChange}
-                                                        onBlur={onBlur}
-                                                        value={value ?? ""}
-                                                        inputRef={ref}
-                                                    />
-                                                    : 
+                                {infoEdit ? (
+                                    <Grid container display="flex" alignItems="center">
+                                        <Grid item xs={7} sm={6} md={6}>
+                                            <Controller
+                                                name="firstName"
+                                                rules={{
+                                                    required: "First Name is required"
+                                                }}
+                                                control={customerInforControl}
+                                                render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                                    <FormControl fullWidth error={!!error}>
+                                                        <TextField
+                                                            id="firstName"
+                                                            label="First Name"
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            value={value ?? ""}
+                                                            inputRef={ref}
+                                                        />
+                                                        {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
+                                                    </FormControl>
+                                                }
+                                            />
+                                        </Grid>
+                                        <Grid item xs={7} sm={6} md={6} display="flex" justifyContent="flex-end">
+                                            <Controller
+                                                name="lastName"
+                                                rules={{
+                                                    required: "Last Name is required"
+                                                }}
+                                                control={customerInforControl}
+                                                render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                                    <FormControl fullWidth error={!!error}>
+                                                        <TextField
+                                                            id="lastName"
+                                                            label="Last Name"
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            value={value ?? ""}
+                                                            inputRef={ref}
+                                                        />
+                                                        {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
+                                                    </FormControl>
+                                                }
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    ) : (
+                                    <Grid item xs={7} sm={6} md={6}>
+                                        <Controller
+                                            name="name"
+                                            rules={{
+                                                required: "Name is required"
+                                            }}
+                                            control={customerInforControl}
+                                            render={({ field: { value }, fieldState: { error } }) => 
+                                                <FormControl fullWidth error={!!error}>
                                                     <Typography
+                                                        id="name"
                                                         variant='caption'
                                                         sx={{
                                                             color: colors.grey[500],
@@ -249,12 +355,13 @@ export default function Quote() {
                                                     >
                                                         {value}
                                                     </Typography>
-                                                }
-                                                {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
-                                            </FormControl>
-                                        }
-                                    />
-                                </Grid>
+                                                    {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
+                                                </FormControl>
+                                            }
+                                        />
+                                    </Grid>
+                                    )
+                                }
                             </Grid>
                             <Grid container display="flex" alignItems="center">
                                 <Grid item xs={5} sm={6} md={6} display="flex">
@@ -372,6 +479,7 @@ export default function Quote() {
                                 </Grid>
                                 <Grid item xs={7} sm={6} md={6} display="flex" justifyContent="flex-end">
                                     <Button 
+                                        type={financeDetailsEdit ? "button" : "submit"}
                                         onClick={() => financeDetailsEdit ? 
                                                 setFinanceDetailsEdit(false) 
                                                 : 
@@ -380,7 +488,7 @@ export default function Quote() {
                                         size="medium"
                                         sx={{ color: "#08d1cf", fontWeight: "bold" }}
                                     >
-                                        Edit
+                                        {financeDetailsEdit ? "Save" : "Edit"}
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -403,16 +511,22 @@ export default function Quote() {
                                             required: "Principal Amount is required"
                                         }}
                                         control={financialDetailsControl}
-                                        render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                        render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => 
                                             <FormControl fullWidth error={!!error}>
                                                 {financeDetailsEdit ?
-                                                    <TextField
-                                                        id="principalAmount"
-                                                        label="Principal Amount"
+                                                    <Slider
+                                                        name="principalAmount"
+                                                        aria-label="Amount"
+                                                        defaultValue={5000}
                                                         onChange={onChange}
                                                         onBlur={onBlur}
-                                                        value={value ?? 0}
-                                                        inputRef={ref}
+                                                        value={value ?? 5000}
+                                                        getAriaValueText={valueText}
+                                                        step={100}
+                                                        valueLabelDisplay="auto"
+                                                        marks={amounts}
+                                                        min={2100}
+                                                        max={15000}
                                                     />
                                                     : 
                                                     <Typography
@@ -432,11 +546,109 @@ export default function Quote() {
                                         }
                                     />
                                 </Grid>
-                                
+                            </Grid>
+
+                            <Grid container display="flex" alignItems="center">
+                                {financeDetailsEdit ? (
+                                    <>
+                                        <Grid item xs={5} sm={6} md={6} display="flex">
+                                            <Typography
+                                                variant='caption'
+                                                sx={{
+                                                    color: colors.grey[500],
+                                                    fontSize: "1.1em"
+                                                }}
+                                            >
+                                                Term
+                                            </Typography>
+                                        </Grid>
+                                        <Grid item xs={7} sm={6} md={6}>
+                                            <Controller
+                                                name="termInMonths"
+                                                rules={{
+                                                    required: "Term is required"
+                                                }}
+                                                control={financialDetailsControl}
+                                                render={({ field: { onChange, onBlur, value }, fieldState: { error } }) => 
+                                                    <FormControl fullWidth error={!!error}>
+                                                        <Slider
+                                                            name="termInMonths"
+                                                            aria-label="Term"
+                                                            defaultValue={0}
+                                                            onChange={onChange}
+                                                            onBlur={onBlur}
+                                                            value={value ?? 6}
+                                                            getAriaValueText={valueText}
+                                                            step={6}
+                                                            valueLabelDisplay="on"
+                                                            marks={terms}
+                                                            min={quoteState.termInMonths === 36 ? 6 : quoteState.termInMonths}
+                                                            max={36}
+                                                        />
+                                                        {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
+                                                    </FormControl>
+                                                }
+                                            />
+                                        </Grid>
+                                    </>
+                                    ) : <></>
+                                }
                                 <Box flexGrow={1}>
-                                    <Divider sx={{ borderStyle: "dotted", borderRadius: 5 }} textAlign="right">over {quoteState.termInMonths} months</Divider>
+                                    <Divider 
+                                        sx={{ 
+                                            color: colors.grey[700],
+                                            fontSize: ".8em",
+                                            fontWeight: "bold" 
+                                        }}
+                                        textAlign="right"
+                                    >
+                                        over {quoteState.termInMonths} months
+                                    </Divider>
                                 </Box>
                             </Grid>
+                            {quoteState.repaymentWithoutInterest > 0 ? 
+                                <Grid container display="flex" alignItems="center">
+                                    <Grid item xs={5} sm={6} md={6} display="flex">
+                                        <Typography
+                                            variant='caption'
+                                            sx={{
+                                                color: colors.grey[500],
+                                                fontSize: "1.1em"
+                                            }}
+                                        >
+                                            
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={7} sm={6} md={6}>
+                                        <FormControl fullWidth error={!!error}>
+                                            <Typography
+                                                variant='caption'
+                                                sx={{
+                                                    color: colors.grey[500],
+                                                    fontSize: "1em",
+                                                    fontWeight: "bold"
+                                                }}
+                                                align="right"
+                                            >
+                                                {roundTo(quoteState.repaymentWithoutInterest, 2)}
+                                            </Typography>
+                                        </FormControl>
+                                    </Grid>
+                                    <Box flexGrow={1}>
+                                        <Divider 
+                                            sx={{ 
+                                                color: colors.grey[700],
+                                                fontSize: ".8em",
+                                                fontWeight: "bold" 
+                                            }}
+                                            textAlign="right"
+                                        >
+                                            Repayment from first {quoteState.monthsOfFreeInterest} month(s)
+                                        </Divider>
+                                    </Box>
+                                </Grid>
+                                : <></>
+                            }
                             <Grid container display="flex" alignItems="center">
                                 <Grid item xs={5} sm={6} md={6} display="flex">
                                     <Typography
@@ -456,47 +668,44 @@ export default function Quote() {
                                             required: "Repayment is required"
                                         }}
                                         control={financialDetailsControl}
-                                        render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => 
+                                        render={({ field: { value }}) => 
                                             <FormControl fullWidth error={!!error}>
-                                                {financeDetailsEdit ?
-                                                    <TextField
-                                                        id="repayment"
-                                                        label="Repayment"
-                                                        onChange={onChange}
-                                                        onBlur={onBlur}
-                                                        value={value ?? 0}
-                                                        inputRef={ref}
-                                                    />
-                                                    : 
-                                                    <Typography
-                                                        variant='caption'
-                                                        sx={{
-                                                            color: colors.grey[500],
-                                                            fontSize: "1em",
-                                                            fontWeight: "bold"
-                                                        }}
-                                                        align="right"
-                                                    >
-                                                        {roundTo(value, 2)}
-                                                    </Typography>
-                                                }
-                                                {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
+                                                <Typography
+                                                    variant='caption'
+                                                    sx={{
+                                                        color: colors.grey[500],
+                                                        fontSize: "1em",
+                                                        fontWeight: "bold"
+                                                    }}
+                                                    align="right"
+                                                >
+                                                    {roundTo(value, 2)}
+                                                </Typography>
                                             </FormControl>
                                         }
                                     />
                                 </Grid>
-
                                 <Box flexGrow={1}>
-                                    <Divider sx={{ borderStyle: "dotted", borderRadius: 5 }} textAlign="right">{quoteState.repaymentFrequency}</Divider>
+                                    <Divider 
+                                        sx={{ 
+                                            color: colors.grey[700],
+                                            fontSize: ".8em",
+                                            fontWeight: "bold" 
+                                        }}
+                                        textAlign="right"
+                                    >
+                                        {quoteState.repaymentFrequency}
+                                    </Divider>
                                 </Box>
                             </Grid>
                         </Stack>
                     </Box>
                     <Grid item xs={12}>
-                        {error?.detail ? <FormHelperText>{error?.detail}</FormHelperText> : null }
                         <Stack display="flex" justifyContent="center" alignItems="center" >
+                        {error?.detail ? <FormHelperText sx={{ fontSize: "15px", color: colors.red[500], textAlign: "center" }}>{error?.detail}</FormHelperText> : null }
                             <Box width="70%" >
                                 <Button
+                                    disabled={infoEdit || financeDetailsEdit}
                                     onClick={handleLoanApplication}
                                     fullWidth
                                     variant="contained"
@@ -509,7 +718,7 @@ export default function Quote() {
                     </Grid>
                     <Information props={{ mt: 5, color: colors.grey[500] }} info={
                         `Total repayments ${roundTo(quoteState.totalRepayments, 2)}, made up of an establishment fee of ${roundTo(quoteState.establishmentFee, 2)},
-                        interest of ${roundTo(quoteState.totalInterest, 2)}. The repayment amount is based on the variables selected, 
+                        interest of ${roundTo(quoteState.totalInterest, 2)}. The repayment amount is based on the Product selected, 
                         is subject to our assessment and suitability, and other important terms and conditions apply.`
                         } />
                 </Paper>

@@ -10,6 +10,8 @@ import { useEffect, useState } from "react";
 import productApi from "../../api/productApi";
 import { ProductDto } from "../../models/productDto";
 import { monthsToYears } from "../../utility/monthsToYears";
+import { amounts } from "./amounts";
+import { terms } from "./terms";
 
 const title = [
     {
@@ -19,32 +21,6 @@ const title = [
     {
       label: 'Ms.',
       value: 'Ms.',
-    },
-];
-
-const amounts = [
-    {
-        label: '2,100',
-        value: 2100,
-    },
-    {
-        label: '15,000',
-        value: 15000,
-    },
-];
-
-const terms = [
-    {
-        label: '1mo',
-        value: 0,
-    },
-    {
-        label: '6mos',
-        value: 6,
-    },
-    {
-        label: '36mos',
-        value: 36,
     },
 ];
 
@@ -66,7 +42,8 @@ function InitializeCustomerLoanDto(): CustomerLoanDto {
 export default function QuoteCalculator() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const id = searchParams.get('customerId')
+    const customerId = searchParams.get('customerId')
+    const [disabled, setDisabled] = useState(false)
     const [products, setProducts] = useState<ProductDto[]>([])
     const [product, setProduct] = useState<ProductDto | null>({
         id: '',
@@ -80,12 +57,12 @@ export default function QuoteCalculator() {
     // Get values from api
     const { control, handleSubmit } = useForm({
         defaultValues: async () => 
-                id ? await customerApi.getCustomerLoanById(id!).then((customerLoanData) => {return customerLoanData!}) : InitializeCustomerLoanDto()
+                customerId ? await customerApi.getCustomerLoanById(customerId!).then((customerLoanData) => {return customerLoanData!}) : InitializeCustomerLoanDto()
     })
 
     const onSubmit: SubmitHandler<CustomerLoanDto> = (data) => {
-        if (id) {
-            navigate(`/quote?customerId=${id}&productId=${data.product}&term=${data.termInMonths}&amountRequired=${data.amountRequired}`)
+        if (customerId) {
+            navigate(`/quote?customerId=${customerId}&productId=${data.product}&term=${data.termInMonths}&amountRequired=${data.amountRequired}`)
         } else {
             const request = {
                 title: data.title!,
@@ -112,8 +89,9 @@ export default function QuoteCalculator() {
     }
 
     useEffect(() => {
+        customerId ? setDisabled(true) : setDisabled(false)
         productApi.getAllProducts().then((productData) => setProducts(productData!))
-    }, [])
+    }, [customerId])
 
     return (
         <Container component="main" maxWidth="md">
@@ -242,6 +220,7 @@ export default function QuoteCalculator() {
                                                         onBlur={onBlur}
                                                         value={value ?? "Mr."}
                                                         inputRef={ref}
+                                                        disabled={disabled}
                                                     >
                                                         {title.map((option) => (
                                                             <MenuItem key={option.value} value={option.value}>
@@ -274,6 +253,7 @@ export default function QuoteCalculator() {
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
                                                         inputRef={ref}
+                                                        disabled={disabled}
                                                     />
                                                     {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
@@ -299,6 +279,7 @@ export default function QuoteCalculator() {
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
                                                         inputRef={ref}
+                                                        disabled={disabled}
                                                     />
                                                     {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
@@ -327,6 +308,7 @@ export default function QuoteCalculator() {
                                                 onBlur={onBlur}
                                                 value={value ?? ""}
                                                 inputRef={ref}
+                                                disabled={disabled}
                                             />
                                             {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                         </FormControl>
@@ -354,6 +336,7 @@ export default function QuoteCalculator() {
                                                         onBlur={onBlur}
                                                         value={value ?? ""}
                                                         inputRef={ref}
+                                                        disabled={disabled}
                                                     />
                                                     {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
@@ -375,6 +358,7 @@ export default function QuoteCalculator() {
                                                         onChange={onChange}
                                                         value={dayjs(value) ?? ""}
                                                         inputRef={ref}
+                                                        disabled={disabled}
                                                     />
                                                     {error?.message ? <FormHelperText>{error?.message}</FormHelperText> : null }
                                                 </FormControl>
@@ -392,7 +376,7 @@ export default function QuoteCalculator() {
                                             variant="contained"
                                             sx={{ mt: 3, mb: 2, color: "white", padding: "15px" }}
                                         >
-                                            Calculate quote
+                                            {customerId ? "Calculate quote" : "Register"}
                                         </Button>
                                     </Box>
                                 </Stack>

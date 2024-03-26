@@ -1,6 +1,8 @@
 ﻿using Application.Customers.CalculateCustomerQuote;
 using Application.Customers.CreateCustomerLoanRate;
 using Application.Customers.GetCustomerLoanById;
+using Application.Customers.UpdateCustomerInfo;
+using Application.Customers.UpdateFinanceDetails;
 using Application.LoanApplications.CreateLoanApplication;
 using Domain.Shared;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +73,46 @@ public sealed class CustomerController : ApiController
     public async Task<IActionResult> CreateLoanApplication([FromBody] CreateLoanApplicationRequest request, CancellationToken cancellationToken)
     {
         Result result = await Mediator.Send(request, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("update/{customerId:guid}")]
+    public async Task<IActionResult> UpdateCustomerInfo(Guid customerId, [FromBody] UpdateCustomerInfoRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdateCustomerInfoCommand(
+            customerId,
+            request.FirstName,
+            request.LastName,
+            request.Mobile,
+            request.Email);
+
+        Result result = await Mediator.Send(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return HandleFailure(result);
+        }
+
+        return Ok(result);
+    }
+
+    [HttpPut]
+    [Route("loan/update/{customerId:guid}")]
+    public async Task<IActionResult> UpdateCustomerFinanceDetails(Guid customerId, [FromBody] UpdateFinanceDetailsRequest request, CancellationToken cancellationToken)
+    {
+        var command = new UpdateFinanceDetailsCommand(
+            customerId,
+            request.AmountRequired,
+            request.TermInMonths);
+
+        Result result = await Mediator.Send(command, cancellationToken);
 
         if (result.IsFailure)
         {

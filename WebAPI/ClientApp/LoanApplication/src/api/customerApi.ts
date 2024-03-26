@@ -1,4 +1,4 @@
-import { CalculateCustomerQuoteRequest, CalculateCustomerQuoteResponse, CustomerLoanApplicationRequest, CustomerLoanDto, CustomerLoanRate } from "../models/customerLoanDto";
+import { CalculateCustomerQuoteRequest, CalculateCustomerQuoteResponse, CustomerInfoRequest, CustomerLoanApplicationRequest, CustomerLoanDto, CustomerLoanRate, FinanceDetailsRequest } from "../models/customerLoanDto";
 import { ResultResponse } from "../models/resultResponse";
 import { API_BASE_URL } from './../../config';
 import axiosInstance from "./axiosInstance";
@@ -18,13 +18,24 @@ const customerApi = {
 
     calculateQuote: async (calculateCustomerQuoteRequest: CalculateCustomerQuoteRequest): Promise<ResultResponse<CalculateCustomerQuoteResponse>> => {
         const response = await axiosInstance.get<ResultResponse<CalculateCustomerQuoteResponse>>(`${API_BASE_URL}/api/customers/calculate/quote`, { params: calculateCustomerQuoteRequest });
-        console.log("calculateQuote")
         console.log(response)
         return response.data;
     },
 
-    customerLoanApplication: async (customerLoanApplicationRequest: CustomerLoanApplicationRequest): Promise<string> => {
+    customerLoanApplication: async (customerLoanApplicationRequest: CustomerLoanApplicationRequest): Promise<void> => {
         const response = await axiosInstance.post(`/api/customers/loan/application`, customerLoanApplicationRequest);
+        console.log(response)
+        return response.data;
+    },
+
+    updateCustomerInfo: async (customerId: string, customerInfo: CustomerInfoRequest): Promise<string> => {
+        const response = await axiosInstance.put(`/api/customers/update/${customerId}`, customerInfo);
+        console.log(response)
+        return response.data;
+    },
+
+    updateFinanceDetails: async (customerId: string, financeDetails: FinanceDetailsRequest): Promise<string> => {
+        const response = await axiosInstance.put(`/api/customers/loan/update/${customerId}`, financeDetails);
         console.log(response)
         return response.data;
     },

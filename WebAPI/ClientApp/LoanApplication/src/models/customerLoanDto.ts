@@ -37,12 +37,14 @@ export interface CalculateCustomerQuoteResponse {
     principalAmount: number,
     termInMonths: number,
     repayment: number,
+    repaymentWithoutInterest: number,
     repaymentFrequency: string,
     perAnnumInterestRate: number,
     monthlyInterestRate: number,
     totalRepayments: number,
     establishmentFee: number,
-    totalInterest: number
+    totalInterest: number,
+    monthsOfFreeInterest: number
 }
 
 export interface CustomerLoanApplicationRequest {
@@ -52,4 +54,16 @@ export interface CustomerLoanApplicationRequest {
     totalRepayments: number,
     interestRate: number,
     interest: number
+}
+
+export interface CustomerInfoRequest {
+    firstName: string,
+    lastName: string,
+    mobile: string,
+    email: string,
+}
+
+export interface FinanceDetailsRequest {
+    amountRequired: number,
+    termInMonths: number
 }
