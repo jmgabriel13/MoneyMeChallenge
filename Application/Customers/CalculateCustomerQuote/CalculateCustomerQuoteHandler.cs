@@ -38,8 +38,11 @@ internal sealed class CalculateCustomerQuoteHandler(
         // then divide it by 12months(1yr) to convert it to percentage.
         double monthlyInterestRate = (double)product.PerAnnumInterestRate / 100 / (int)RepaymentFrequency.Monthly;
 
-        // consider other fees, add to amountRequired from request
-        int principalAmount = customer.Loan.AmountRequired + product.EstablishmentFee;
+        // consider other fees
+        //int principalAmount = customer.Loan.AmountRequired + product.EstablishmentFee;
+        int principalAmount = customer.Loan.AmountRequired;
+
+        decimal otherFees = decimal.Divide(product.EstablishmentFee, customer.Loan.TermInMonths);
 
         // calculate using PMT Function to get monthly payment WITH interest based on monthly interest rate
         double monthlyPaymentWithInterestFinal = -Financial.Pmt(
@@ -47,7 +50,10 @@ internal sealed class CalculateCustomerQuoteHandler(
             customer.Loan.TermInMonths,
             principalAmount);
 
-        // calculate total repayments with interest based on term in months
+        // add other fees
+        monthlyPaymentWithInterestFinal += (double)otherFees;
+
+        // calculate total repayments with interest based on term in months and other fees included
         decimal totalRepaymentsWithInterestFinal = (decimal)monthlyPaymentWithInterestFinal * customer.Loan.TermInMonths;
         // Calculate first the totalInterest by subtracting principal amount(AmountRequired) to total repayments with interest
         decimal totalInterestFinal = totalRepaymentsWithInterestFinal - principalAmount;
@@ -58,7 +64,7 @@ internal sealed class CalculateCustomerQuoteHandler(
         {
             // calculate using PMT Function to get monthly payment WITHOUT interest
             monthlyPaymentWithoutInterestFinal = -Financial.Pmt(
-                0,
+                monthlyInterestRate,
                 customer.Loan.TermInMonths,
                 principalAmount);
 
