@@ -19,8 +19,17 @@ cd MoneyMeChallenge/
     ```
     - If the result is error, make sure the default project in Package Manager Console is <b>Infrastructure</b> and you set the <b>WebApp<b> Start up Project.
  
-## Front End Link
-- The front end default link is on <b>"/"</b>, or <b>/quote-calculation</b>
+## Front End
+- Front-end link
+    - The front end default link is on <b>"/"</b>, or <b>/quote-calculation</b>
+- Change API_BASE_URL
+  - Navigate to <b>ClientApp/LoanApplication/</b>, edit the <b>config.ts</b> based on the url local port of <b>WebApp</b>.
+  - After you change the API_BASE_URL from front end, run build from <b>ClientApp/LoanApplication/</b>
+  ```shell
+        npm run build
+  ```
+  - Then the build files will be located at wwwroot of <b>WebApp</b> project and served it as static files.
+
 
 ## API Endpoint
 
