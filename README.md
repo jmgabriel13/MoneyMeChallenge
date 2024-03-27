@@ -24,7 +24,7 @@ cd MoneyMeChallenge/
 
 ## API Endpoint
 
-## Login
+## Customer Loan Rate
 
 Used to get customer loan rate, that accept the following request
 
