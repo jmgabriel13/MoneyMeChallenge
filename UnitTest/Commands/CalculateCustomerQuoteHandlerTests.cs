@@ -159,19 +159,19 @@ public class CalculateCustomerQuoteHandlerTests
 
     [Theory]
     // done
-    //[InlineData(5000, 9.2, 24, 0, 241.38, 0)]
+    [InlineData(5000, 9.2, 24, 0, 241.38, 0)]
 
     // some 1 to 2 number discrepancy
     [InlineData(5000, 9.2, 24, 2, 242.52, 208.33)] // Typical scenario with interest-free period
 
     // done
-    //[InlineData(10000, 5.0, 12, 0, 881.07, 0)] // High principal amount with no interest-free period
+    [InlineData(10000, 5.0, 12, 0, 881.07, 0)] // High principal amount with no interest-free period
 
     // not tested
-    //[InlineData(1000, 10.0, 6, 4, 166.67)] // Low principal amount with interest-free period
+    [InlineData(1000, 10.0, 6, 4, 166.67, 316.67)] // Low principal amount with interest-free period
 
     // done
-    //[InlineData(2000, 8.0, 36, 0, 71.01, 0)] // Long term with no interest-free period
+    [InlineData(2000, 8.0, 36, 0, 71.01, 0)] // Long term with no interest-free period
     public async Task Handle_Should_Calculate_MonthlyPayment_With_Interest_Accurately(
         int amountRequired,
         decimal perAnnumInterestRate,

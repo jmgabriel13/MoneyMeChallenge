@@ -64,7 +64,7 @@ internal sealed class CalculateCustomerQuoteHandler(
         {
             // calculate using PMT Function to get monthly payment WITHOUT interest
             monthlyPaymentWithoutInterestFinal = -Financial.Pmt(
-                monthlyInterestRate,
+                0,
                 customer.Loan.TermInMonths,
                 principalAmount);
 
